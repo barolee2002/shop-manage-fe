@@ -1,0 +1,37 @@
+
+.Sidebar {
+  .hover__effect {
+    transition: background-color 0.2s ease-in-out;
+    &:hover {
+      background-color: #0088ff;
+    }
+  }
+  .menu__item__active {
+    background-color: #0088ff;
+    &:hover {
+      background-color: #0088ff;
+    }
+  }
+  .chevronIcon {
+    color: #fff;
+    border-radius: 8px;
+  }
+
+  .sub__menu__item {
+    .sub__menu__icon {
+      font-size: 0rem;
+      transition: font-size 0.2s ease-in-out;
+    }
+    &:hover {
+      color: #fff;
+      .sub__menu__icon {
+        font-size: 0.6rem;
+      }
+    }
+    &__active {
+      .sub__menu__icon {
+        font-size: 0.6rem;
+      }
+    }
+  }
+}

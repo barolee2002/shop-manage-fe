@@ -1,0 +1,9 @@
+.auto-slider{
+    .place-buttons {
+        display: flex;
+        justify-content: center;
+        &-btn{
+            color: #ccc;
+        }
+    }
+}
