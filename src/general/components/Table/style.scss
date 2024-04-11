@@ -1,0 +1,41 @@
+.cutome-table{
+    width: 100%;
+    // border-collapse: separate ;
+    cursor: pointer;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    &-head-row {
+        line-height: 3;
+        background-color: #f6f6f6;
+        font-size: 16px;
+        // font-weight: 00;
+    }
+    &-body-row{
+        line-height: 3;
+        
+
+    }
+    &-pagination{
+        width: 100%;
+        display: flex;
+        justify-content: center;
+        text-align: center;
+        margin-top: 12px;
+    }
+    .drop-down-row {
+        animation: dropdownAnimation 0.5s ease forwards; /* Apply animation */
+
+    }
+   
+}
+
+@keyframes dropdownAnimation {
+    from {
+      opacity: 0;
+      transform: translateY(-10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }

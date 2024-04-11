@@ -8,6 +8,7 @@ import { AppConstants } from '../../constants/AppConstants';
 interface Props {
   window?: () => Window;
   children: React.ReactElement;
+  topbarChildren: React.ReactElement;
 }
 function ScrollTop(props: Props) {
   const { children, window } = props;
@@ -40,8 +41,8 @@ export const BaseLayout = (props: Props) => {
   return (
     <Box sx={{ display: 'flex' }}>
       <Sidebar />
-      <div className="d-flex flex-column w-100" style={{ overflow: 'hidden' }}>
-        <Topbar />
+      <div className="d-flex flex-column w-100" style={{ position : 'relative'}}>
+        <Topbar>{props.topbarChildren}</Topbar>
         <Container sx={{ marginTop: `${AppConstants.sidebarHeight}px` }} maxWidth="xl">
           {props.children}
         </Container>

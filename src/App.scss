@@ -1,12 +1,23 @@
+@import "./utils/variable.scss";
+
 .App {
   text-align: center;
 }
-
+.cost-price {
+  color : $cost-price;
+  font-weight: 500;
+}
+.sell-price {
+  color : $sell-price;
+  font-weight: 500;
+}
 .App-logo {
   height: 40vmin;
   pointer-events: none;
 }
-
+.MuiTableCell-root{
+  font-size: 14px !important;
+}
 @media (prefers-reduced-motion: no-preference) {
   .App-logo {
     animation: App-logo-spin infinite 20s linear;
@@ -32,7 +43,7 @@
   background-color: #fff;
   align-items: center;
   justify-content: space-between;
-  gap: 0 550px;
+  // gap: 0 550px;
   .action{
       display: flex;
       &-btn{
@@ -59,6 +70,9 @@
 }
 .bd-radius-6{
   border-radius: 6px !important;
+}
+.quantity-danger{
+  color : #e70202;
 }
 .modal-wrapper {
   &-headding {

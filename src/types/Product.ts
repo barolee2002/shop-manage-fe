@@ -1,11 +1,15 @@
 export type ProductAttributeType = {
   id: number;
+  code: string;
+  costPrice: number;
+  sellPrice: number;
   productId: number;
-  material: string;
-  origin: string;
-  size: string;
   imageLink: string;
-  variation: string;
+  quantity : number;
+  otherAttribute: {
+    name: string;
+    value: string;
+  }[];
   inventoryList: InventoryCost[];
 };
 export type ProductType = {
@@ -17,7 +21,11 @@ export type ProductType = {
   ownerId: number;
   brand: string;
   category: string;
-  imageLinks: string[];
+  minPrice: number;
+  totalQuantity: number;
+  maxPrice: number;
+
+  imageLinks: string;
   attributes: ProductAttributeType[];
   createAt: string;
   updatedAt: string;

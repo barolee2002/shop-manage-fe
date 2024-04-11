@@ -8,28 +8,7 @@ import axiosClient from 'src/api/axiosClient';
 import { style } from 'src/utils/CustomStyle/StyleModal';
 import { VisuallyHiddenInput } from 'src/utils/CustomStyle/StyleUploadButton';
 
-// const style = {
-//   position: 'absolute',
-//   top: '50%',
-//   left: '50%',
-//   transform: 'translate(-50%, -50%)',
-//   width: 600,
-//   bgcolor: 'background.paper',
-//   border: '2px solid #000',
-//   boxShadow: 24,
-//   p: 4,
-// };
-// const VisuallyHiddenInput = styled('input')({
-//   clip: 'rect(0 0 0 0)',
-//   clipPath: 'inset(50%)',
-//   height: 1,
-//   overflow: 'hidden',
-//   position: 'absolute',
-//   bottom: 0,
-//   left: 0,
-//   whiteSpace: 'nowrap',
-//   width: 1,
-// });
+
 interface Props {
   detail: ProductType;
   open: boolean;
@@ -117,7 +96,6 @@ export default function UpdateProductDetailModal(props: Props) {
                         }}
                       />
                     </Button>
-                    {/* </input> */}
                   </Box>
                   {imagelinks?.map((link, index) => (
                     <Box className="image-list-item" key={index}>

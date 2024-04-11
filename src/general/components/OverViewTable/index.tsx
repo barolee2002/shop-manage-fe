@@ -4,6 +4,7 @@ import { DataGrid, GridColDef } from '@mui/x-data-grid';
 
 import { Box, Pagination, PaginationItem } from '@mui/material';
 import { ArrowBack as ArrowBackIcon, ArrowForward as ArrowForwardIcon } from '@mui/icons-material';
+import CustomNoRowsOverlay from '../NoRowsOverlay';
 
 interface row {
   key: number;
@@ -37,8 +38,12 @@ export default function OverviewTable(props: Props) {
         disableColumnSelector
         hideFooterPagination
         hideFooter
+        slots={{ noRowsOverlay: CustomNoRowsOverlay }}
+        autoHeight
+        autoPageSize
         // autoPageSize
         getRowClassName={() => 'content-wrapper-table-row'}
+        sx={{ '--DataGrid-overlayHeight': '300px', fontSize: '14px' }}
       />
       <div className="content-wrapper-table-pagination">
         <Pagination

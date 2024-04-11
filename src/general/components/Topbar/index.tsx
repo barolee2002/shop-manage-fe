@@ -5,11 +5,13 @@ import { ChildFriendlyRounded } from '@mui/icons-material';
 
 const AppBar = styled('div')(() => ({
   display: 'flex',
-  position: 'fixed',
+  position: 'absolute',
   zIndex: 1000,
   alignItems: 'center',
   justifyContent: 'between',
-  width: '100%',
+  // width: '100%',
+  right: 0,
+  left: 0,
   height: AppConstants.sidebarHeight,
   backgroundColor: '#fff',
   boxShadow: '0 4px 8px 0 rgb(0 0 0 / 5%)',
@@ -17,13 +19,10 @@ const AppBar = styled('div')(() => ({
 interface Props {
   children: React.ReactElement;
 }
-export const Topbar = () => {
+export const Topbar = ({ children }: Props) => {
   return (
     <AppBar>
-      <Toolbar>
-        <Typography variant="h6" component="div">
-        </Typography>
-      </Toolbar>
+      <Toolbar sx={{width: '100%' , justifyContent: 'space-between' }}>{children}</Toolbar>
     </AppBar>
   );
 };

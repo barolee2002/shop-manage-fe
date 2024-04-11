@@ -189,7 +189,7 @@ export default function Sidebar() {
           open ? 'justify-content-between' : 'justify-content-center'
         }`}
       >
-        {open && <Box sx={{ fontWeight: '900', fontSize: '1.8rem' }}>CLOTHESSHOP</Box>}
+        {open && <Box sx={{ fontWeight: '900', fontSize: '1.8rem' }}>SHOPMANAGE</Box>}
         <IconButton className="chevronIcon hover__effect" onClick={handleDrawer}>
           {!open ? <ChevronRightIcon sx={{ color: '#fff' }} /> : <ChevronLeftIcon sx={{ color: '#fff' }} />}
         </IconButton>

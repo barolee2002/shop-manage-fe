@@ -1,11 +1,6 @@
+@import "../../../utils/variable.scss";
+
 .product-list {
-  .action {
-    display: flex;
-    justify-content: flex-end;
-    &-add-btn {
-      padding: 8px 28px;
-    }
-  }
   .fillter-box {
     width: 20%;
   }
@@ -13,9 +8,8 @@
   .content {
     &-wrapper {
       background-color: #fff;
-      padding: 25px;
+      padding: 12px;
       border-radius: 6px;
-      margin-top: 25px;
       &-search {
         display: flex;
         justify-content: space-between;
@@ -58,18 +52,26 @@
         }
       }
       &-table {
-        margin-top: 25px;
+        margin-top: 12px;
+        .cost-price {
+          color : $cost-price;
+          font-weight: 500;
+        }
+        .sell-price {
+          color : $sell-price;
+          font-weight: 500;
+        }
         &-header {
-          background-color: #ddd;
-        }
-        &-row {
-          text-align: center;
-          cursor: pointer;
-        }
-        &-pagination {
-          margin-top: 12px;
-          display: flex;
-          justify-content: center;
+          background-color: #f6f6f6;
+          font-size: 16px;
+          &-title {
+            color : $table-name-col;
+            &:hover {
+              border-bottom: solid 1px $table-name-col;
+              margin-bottom: -1px;
+            }
+          }
+          
         }
       }
     }

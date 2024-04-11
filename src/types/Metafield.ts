@@ -9,3 +9,7 @@ export type MetafieldRequest = {
   value?: string;
   value_type: 'string' | 'integer';
 };
+export type PreviousPageType = {
+  title : string;
+  link : string;
+}

@@ -8,6 +8,7 @@ export const productSlice = createSlice({
   },
   reducers: {
     updateProduct: (state, action) => {
+      
       state.data = action.payload;
     },
   },
