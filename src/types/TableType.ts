@@ -1,4 +1,4 @@
-import { metaData } from "./MetaData";
+import { metaData } from './MetaData';
 
 interface Column {
   field: string;
@@ -12,10 +12,16 @@ interface Row {
   [key: string]: any;
 }
 export interface TableProps {
-  columns: Column[];
-  rows: Row[];
-  metadata: metaData;
-  onChangePage: (event: React.ChangeEvent<unknown>, value: number) => void;
-  onRowClick: (item: any) => void;
-  className: string;
+  columns?: Column[];
+  rows?: Row[];
+  metadata?: metaData;
+  onChangePage?: (event: React.ChangeEvent<unknown>, value: number) => void;
+  onRowClick?: (item: any) => void;
+  className?: string;
+  onCellClick?: (field: string, item: any) => void;
+  pagination ?: boolean;
+}
+
+export interface unknowType {
+  [key: string]: any;
 }

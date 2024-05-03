@@ -1,6 +1,7 @@
 export type ProductAttributeType = {
   id: number;
   code: string;
+  productName : string;
   costPrice: number;
   sellPrice: number;
   productId: number;
@@ -15,7 +16,6 @@ export type ProductAttributeType = {
 export type ProductType = {
   id: number;
   key: number;
-  code: string;
   name: string;
   status: number;
   ownerId: number;
@@ -25,7 +25,7 @@ export type ProductType = {
   totalQuantity: number;
   maxPrice: number;
 
-  imageLinks: string;
+  imageLink: string;
   attributes: ProductAttributeType[];
   createAt: string;
   updatedAt: string;

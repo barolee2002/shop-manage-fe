@@ -56,12 +56,12 @@
 .App-link {
   color: #61dafb;
 }
-.back-page-btn{
-  font-size: 16px !important;
-  display: flex;
-  gap : 0 12px;
-  padding: 0 !important;
-}
+// .back-page-btn{
+//   font-size: 16px !important;
+//   display: flex;
+//   gap : 0 12px;
+//   padding: 0 !important;
+// }
 .w-100{
   width: 100%;
 }
@@ -74,6 +74,22 @@
 .quantity-danger{
   color : #e70202;
 }
+.sub-header {
+  display: flex;
+  justify-content: space-between;
+  border-bottom: 1px solid #ddd;
+  margin-bottom: 16px;
+  padding: 8px 0;
+  &-title{
+    font-weight: 500;
+    font-size: 16px;
+    margin: 0;
+    vertical-align: middle;
+    padding: 0;
+    text-align: center;
+    
+  }
+}
 .modal-wrapper {
   &-headding {
     display: flex;
@@ -82,9 +98,14 @@
     margin-bottom: 20px;
     .title {
       font-weight: 500;
-      padding: 12px 0;
+      // margin-bottom: 12px;
+      text-align:end;
+      font-size: 16px;
       
       
+    }
+    .close-btn {
+      font-size: 28px;
     }
   }
   .modal-form {
@@ -127,22 +148,36 @@
     }
   }
   &-save-btn{
-    padding: 8px 12px;
+    padding: 8px 24px;
   }
 }
 .css-1wnsr1i {
   border: 1px solid #ddd !important;
 }
-
+.MuiBox-root.css-b8tju9 {
+  border-radius: 6px;
+  border : 1px solid #ddd;
+}
 .row {
   display: flex;
   flex-direction: row;
+}
+.image-product{
+  width: 50px;
+  height: 50px;
+  object-fit: cover;
+  opacity: 0.5;
 }
 .gap-25 {
   display: flex;
   gap: 0 25px;
 }
-
+.MuiButton-root {
+  font-size: 14px !important;
+}
+.MuiTab-root{
+  font-size: 14px !important;
+}
 @keyframes App-logo-spin {
   from {
     transform: rotate(0deg);

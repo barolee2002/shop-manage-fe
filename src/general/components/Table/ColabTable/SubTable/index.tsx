@@ -10,9 +10,7 @@ interface Props extends TableProps {
   pagination: boolean;
 }
 
-export default function SubTable(props: Partial<Props>) {
-  console.log('subtable');
-
+const SubTable = (props: Partial<Props>) => {
   return (
     <React.Fragment>
       <Box className="sub-table">
@@ -58,3 +56,5 @@ export default function SubTable(props: Partial<Props>) {
     </React.Fragment>
   );
 }
+
+export default React.memo(SubTable);

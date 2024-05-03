@@ -1,19 +1,26 @@
 import { TableRow, TableCell } from '@mui/material';
-import { TableProps } from 'src/types/TableType';
+import { ProductType } from 'src/types/Product';
+import { TableProps, unknowType } from 'src/types/TableType';
 
 interface Props extends TableProps {
   row: {
     [key: string]: any;
   };
+  onCellClick?: (field: string , item : any) => void
+
 }
 
-export default function OnceRow(props: Partial<Props>) {
+export default function OnceRow(props: Partial<Props>[]) {
+  const { columns, row,onRowClick,onCellClick } = props[0];
   return (
     <TableRow>
-      <TableCell></TableCell>
-      {props.columns?.map((column) => (
-        <TableCell key={column.field}>
-          {column.renderCell ? column.renderCell(props.row) : props.row && props.row[column?.field]}
+      <TableCell width={'6%'}></TableCell>
+      {columns?.map((column) => (
+        <TableCell key={column.field} onClick={() => {
+          onCellClick &&
+          onRowClick && onRowClick(row)
+          }}>
+          {column.renderCell ? column.renderCell(row) : row && row[column?.field]}
         </TableCell>
       ))}
     </TableRow>

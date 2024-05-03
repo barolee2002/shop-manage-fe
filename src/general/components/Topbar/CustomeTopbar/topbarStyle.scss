@@ -1,0 +1,16 @@
+.page-title{
+    display: inline;
+    font-size: 20px;
+    font-weight: 500;
+    text-align: center;
+    .MuiSvgIcon-fontSizeMedium {
+        font-size: 30px;
+    }
+}
+.back-page-btn{
+    cursor: pointer;
+}
+.btn-group{
+    display: flex;
+    gap : 0 24px;
+}

@@ -86,7 +86,6 @@ const Drawer = styled(MuiDrawer, {
 export default function Sidebar() {
   const navigate = useNavigate();
   const location = useLocation();
-  console.log(location.pathname);
 
   const [open, setOpen] = useState(localStorage.getItem('sidebar') === 'true');
   const [openSubMenu, setOpenSubMenu] = useState<string>('');

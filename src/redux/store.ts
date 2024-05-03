@@ -1,4 +1,5 @@
 import { configureStore } from '@reduxjs/toolkit';
+import productEditReducer from 'src/features/Product/ProductCreating/productEditSlice';
 import productDetailReducer from 'src/features/Product/ProductDetail/productDetailSlice';
 import productReducer from 'src/features/Product/ProductsList/ProductSlice';
 
@@ -6,6 +7,7 @@ const store = configureStore({
   reducer: {
     products: productReducer,
     productDetail : productDetailReducer,
+    productEdit : productEditReducer
   },
 });
 

@@ -43,10 +43,7 @@ function Row(props: Props) {
         <TableCell align="center" className="attribute-image">
           <img src={row.imageLink} alt="attribute" className="attribute-image-row" />
         </TableCell>
-        <TableCell align="right">{row.material}</TableCell>
-        <TableCell align="right">{row.origin}</TableCell>
-        <TableCell align="right">{row.size}</TableCell>
-        <TableCell align="right">{row.variation}</TableCell>
+        
         <TableCell align="right">
           <IconButton onClick={() => handleEditAttribute(row)}>
             <EditIcon />

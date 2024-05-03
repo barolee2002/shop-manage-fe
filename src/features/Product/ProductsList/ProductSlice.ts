@@ -8,11 +8,15 @@ export const productSlice = createSlice({
   },
   reducers: {
     updateProduct: (state, action) => {
-      
       state.data = action.payload;
+    },
+    changeProduct: (state, action) => {
+      state.data = state.data.map((data) => {
+        return data.id === action.payload.id ? action.payload : data;
+      });
     },
   },
 });
 
-export const { updateProduct } = productSlice.actions;
+export const { updateProduct,changeProduct } = productSlice.actions;
 export default productSlice.reducer;

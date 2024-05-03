@@ -5,148 +5,111 @@ import React from 'react';
 import { useSelector } from 'react-redux';
 import axiosClient from 'src/api/axiosClient';
 import { BaseLayout } from 'src/general/components/BaseLayout';
-import { styled, alpha } from '@mui/material/styles';
-import { Box, Button, TextField, Menu, Pagination, PaginationItem } from '@mui/material';
-import { MenuProps } from '@mui/material';
-import Select, { SelectChangeEvent } from '@mui/material/Select';
+import {
+  Box,
+  Button,
+  InputLabel,
+  FormControl,
+  MenuItem,
+  TextField,
+  IconButton,
+  Snackbar,
+  Alert,
+  Fade,
+  CircularProgress,
+} from '@mui/material';
 import { producrSelector } from 'src/redux/selector';
 import InputAdornment from '@mui/material/InputAdornment';
-import { Search as SearchIcon, ArrowBack as ArrowBackIcon } from '@mui/icons-material';
-import { updateProduct } from './ProductSlice';
-import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
-import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
-import { DatePicker } from '@mui/x-date-pickers/DatePicker';
-import MenuItem from '@mui/material/MenuItem';
+import { Search as SearchIcon, ModeEdit as ModeEditIcon } from '@mui/icons-material';
+import { changeProduct, updateProduct } from './ProductSlice';
 import './style.scss';
 import { useDispatch } from 'react-redux';
-import { getformatDate } from 'src/utils/formatDate';
 import { Dayjs } from 'dayjs';
 import { metaData } from 'src/types/MetaData';
-import { StyledMenu } from 'src/utils/CustomStyle/StyleMenu';
 import { ProductAttributeType, ProductType } from 'src/types/Product';
 import { useNavigate } from 'react-router';
-import { useDebounce } from 'src/hook';
-import ProductListTopbar from 'src/general/components/Topbar/ProductListTopbar';
+import { useDebounce } from 'src/hook/useDebounce';
+import CustomeTopbar from 'src/general/components/Topbar/CustomeTopbar';
 import ColabTable from 'src/general/components/Table/ColabTable';
 import SubTable from 'src/general/components/Table/ColabTable/SubTable';
 import OnceRow from 'src/general/components/Table/Product/OnceRow';
 import ColabRow from 'src/general/components/Table/Product/ColabRow';
+import UpdateProductModal from 'src/general/components/Modal/UpdateProductModal';
+import { productColumns, productSubColumns } from 'src/general/components/Table/TableColumn/TableColumns';
+import { uploadImage } from 'src/utils/upLoadImage';
+import AttributeModal from 'src/general/components/Modal/AttributeModal';
+import Filter from 'src/general/components/Filter';
+import DateTimeTextfield from 'src/general/components/Filter/DateTimeTextfield';
+import SelectTextField from 'src/general/components/Filter/SelectTextField';
+import Select, { SelectChangeEvent } from '@mui/material/Select';
+import { inventoryType } from 'src/types/inventory';
+import { testuser } from 'src/utils/test';
+import useGetInventory from 'src/hook/useGetInventory';
+import useGetCategory from 'src/hook/useGetCategory';
 
-const columns = [
-  { field: 'key', headerName: 'STT', headerClassName: 'content-wrapper-table-header', width: 90 },
-  {
-    field: 'name',
-    headerName: 'Tên sản phẩm',
-    headerClassName: 'content-wrapper-table-header',
-    flex: 1,
-    renderCell: (params: ProductType) => <p className="content-wrapper-table-header-title">{params.name}</p>,
-  },
-  {
-    field: 'code',
-    headerName: 'Mã sản phẩm',
-    headerClassName: 'content-wrapper-table-header',
-    flex: 1,
-  },
-  {
-    field: 'totalQuantity',
-    headerName: 'Số lượng',
-    headerClassName: 'content-wrapper-table-header',
-    renderCell: (params: ProductType) => (
-      <p className={params.totalQuantity > 10 ? '' : 'quantity-danger'}>{ params.totalQuantity?.toLocaleString()}</p>
-    ),
-  },
-  {
-    field: 'price',
-    headerName: 'Giá bán',
-
-    headerClassName: 'content-wrapper-table-header',
-  },
-  {
-    field: 'category',
-    headerName: 'Loại sản phẩm',
-    headerClassName: 'content-wrapper-table-header',
-    flex: 1,
-  },
-  {
-    field: 'brand',
-    headerName: 'Nhãn hiệu',
-    headerClassName: 'content-wrapper-table-header',
-    flex: 1,
-  },
-  {
-    field: 'createAt',
-    headerName: 'Ngày tạo',
-    headerClassName: 'content-wrapper-table-header',
-    // width: 150,
-    flex: 1,
-
-    renderCell: (params: ProductType) => <p>{getformatDate(params.createAt)}</p>,
-  },
-];
-const subColumns = [
-  {
-    field: 'imageLink',
-    headerName: 'Ảnh',
-    headerClassName: 'content-wrapper-table-header',
-    flex: 1,
-    renderCell: (params: ProductAttributeType) => <img src={params.imageLink} alt="product" />,
-  },
-  {
-    field: 'name',
-    headerName: 'Sản phẩm',
-    headerClassName: 'content-wrapper-table-header',
-    flex: 1,
-  },
-  {
-    field: 'code',
-    headerName: 'Mã sản phẩm',
-    headerClassName: 'content-wrapper-table-header',
-    flex: 1,
-  },
-  {
-    field: 'costPrice',
-    headerName: 'Giá nhập',
-    headerClassName: 'content-wrapper-table-header',
-    flex: 1,
-    renderCell: (params: ProductAttributeType) => <p className="cost-price">{params.costPrice?.toLocaleString()}</p>,
-  },
-  {
-    field: 'sellPrice',
-    headerName: 'Giá bán',
-    headerClassName: 'content-wrapper-table-header',
-    flex: 1,
-    renderCell: (params: ProductAttributeType) => <p className="sell-price">{params.sellPrice?.toLocaleString()}</p>,
-  },
-  {
-    field: 'quantity',
-    headerName: 'Số lượng',
-    headerClassName: 'content-wrapper-table-header',
-    flex: 1,
-  },
-];
 export default function Product() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const products = useSelector(producrSelector);
-  const [anchorEl, setAnchorEl] = React.useState<HTMLButtonElement | null>(null);
-  const [categories, setCategries] = React.useState<string[]>([]);
+  const [alertMessage, setAlertMessage] = React.useState('');
+  const [openAlert, setOpenAlert] = React.useState(false);
+  const [typeAlert, setTypeAlert] = React.useState<any>('success');
+  const [categories, isPendingGetCategories] = useGetCategory(testuser.storeId);
   const [category, setCategory] = React.useState('');
   const [metadata, setMetadata] = React.useState<metaData>({} as metaData);
+  const [inventory, setInventory] = React.useState(testuser.storeId);
   const [searchString, setSearchString] = React.useState('');
+  const [show, setShow] = React.useState('');
+  const [editAttribute, setEditAttribute] = React.useState<ProductAttributeType>({} as ProductAttributeType);
+  const [image, setImage] = React.useState<File | null>(null);
+  const [inventories, isPendingGetInventory] = useGetInventory(testuser.storeId);
+  const [editProduct, setEditProduct] = React.useState<ProductType>({} as ProductType);
   const debounceString = useDebounce(searchString, 500);
   const [fromTime, setFromTime] = React.useState<Dayjs | null>(null);
   const [toTime, setToTime] = React.useState<Dayjs | null>(null);
   const [page, setPage] = React.useState(1);
-  const handlePopoverOpen = (event: React.MouseEvent<HTMLButtonElement>) => {
-    setAnchorEl(anchorEl ? null : event.currentTarget);
+  const handleCloseAlert = (event: React.SyntheticEvent | Event, reason?: string) => {
+    if (reason === 'clickaway') {
+      return;
+    }
+    setOpenAlert(false);
   };
-
-  const handlePopoverClose = () => {
-    setAnchorEl(null);
+  const handleCloseMOdal = () => {
+    setShow('');
+    setEditProduct({} as ProductType);
+    setEditAttribute({} as ProductAttributeType);
   };
-
-  const open = Boolean(anchorEl);
-  const id = open ? 'simple-popover' : undefined;
+  const handleChangeProduct = (title: string, value: any) => {
+    setEditProduct((prev) => {
+      return {
+        ...prev,
+        [title]: value,
+      };
+    });
+  };
+  const handleChangeEditAttribute = (title: string, value: any) => {
+    setEditAttribute((prev) => {
+      return {
+        ...prev,
+        [title]: value,
+      };
+    });
+  };
+  const handleChangeAttribute = (attributeId: number, title: string, value: any) => {
+    setEditProduct((prev) => {
+      return {
+        ...prev,
+        attributes: prev.attributes.map((attribute) => {
+          return attribute.id === attributeId
+            ? {
+                ...attribute,
+                [title]: value,
+              }
+            : attribute;
+        }),
+      };
+    });
+  };
   const fetchData = async () => {
     const fromDate =
       fromTime !== null
@@ -156,21 +119,20 @@ export default function Product() {
       toTime !== null
         ? `${toTime.toDate().getFullYear()}-${toTime.toDate().getMonth() + 1}-${toTime.toDate().getDate()}`
         : null;
-    console.log(fromDate, toDate);
     try {
       // const fromDate =
       const response = await axiosClient.get(`product/all`, {
         params: {
-          userId: 1,
+          userId: testuser.id,
           searchString: searchString,
           category: category,
           page: page,
+          inventoryId: inventory,
           fromTime: fromDate,
           toTime: toDate,
         },
       });
-      const categoriesResponse = await axiosClient.get(`product/categories/${1}`);
-      setCategries(categoriesResponse.data);
+      
       setMetadata({
         elements: response.data.elements,
         totalElements: response.data.totalElements,
@@ -178,7 +140,6 @@ export default function Product() {
       });
       // setPage(1);
       page > response.data.totalPages && setPage(1);
-
       dispatch(updateProduct(response.data.data));
     } catch (err) {
       console.log(err);
@@ -186,9 +147,40 @@ export default function Product() {
   };
   React.useEffect(() => {
     fetchData();
-  }, [page, debounceString]);
-  const handleChangeCategory = (event: SelectChangeEvent) => {
-    setCategory(event.target.value as string);
+  }, [page, debounceString, inventory]);
+  const handleUpdateProduct = async () => {
+    try {
+      const link = image !== null ? await uploadImage(image) : null;
+      if (image !== null && link === null) {
+        throw new Error('loi tai anh');
+      }
+      handleChangeProduct('imageLink', link);
+      await axiosClient.put(`product/updating/${editProduct.id}`, { ...editProduct, imageLink: link });
+      dispatch(changeProduct({ ...editProduct, imageLink: link }));
+      setShow('');
+      setOpenAlert(true);
+      setAlertMessage('Cập nhập sẩn phẩm thành công');
+    } catch (err) {
+      console.log(err);
+    }
+  };
+  const handleUpdateAttribute = async () => {
+    try {
+      const link = image !== null ? await uploadImage(image) : null;
+      if (image !== null && link === null) {
+        console.log('loivailol');
+
+        throw new Error('fail to upload image');
+      }
+      handleChangeProduct('imageLink', link);
+      await axiosClient.put(`product-attributes/updating/${editAttribute.id}`, { ...editAttribute, imageLink: link });
+      // dispatch(changeProduct({ ...editProduct, imageLink: link }));
+      setShow('');
+      setOpenAlert(true);
+      setAlertMessage('Cập nhập sẩn phẩm thành công');
+    } catch (err) {
+      console.log(err);
+    }
   };
   const handleFilter = () => {
     fetchData();
@@ -196,16 +188,37 @@ export default function Product() {
   const handleChangPage = (event: React.ChangeEvent<unknown>, value: number) => {
     setPage(value);
   };
-
-  const handleRowClick = (item: ProductType) => {
-    navigate(`${item.id}`);
+  const handleOpenEditModal = (item: ProductType) => {
+    setShow('product');
+    setEditProduct(item);
   };
-  const handleAddProduct = () => {};
+  const handleOpenEditAttributeModal = (item: ProductAttributeType) => {
+    setShow('attribute');
+    setEditAttribute(item);
+  };
+  const handleSetDate = React.useCallback((fromTime: Dayjs | null, toTime: Dayjs | null) => {
+    setFromTime(fromTime);
+    setToTime(toTime);
+  }, []);
+  console.log(fromTime, toTime);
+
+  const handleAddProduct = () => {
+    navigate(`creating`, {
+      state: {
+        pageTitle: 'Quay về trang danh sách sản phẩm',
+        typeTitle: 'navigate',
+        onTitleClick: '/admin/products',
+      },
+    });
+  };
   return (
     <div className="product-list">
       <BaseLayout
         topbarChildren={
-          <ProductListTopbar pageTitle="Danh sách sản phẩm" buttonTitle="Thêm sản phẩm" onAdd={handleAddProduct} />
+          <CustomeTopbar
+            pageTitle="Danh sách sản phẩm"
+            buttonGroup={[{ buttonTitle: 'Thêm sản phẩm', onClick: handleAddProduct }]}
+          />
         }
       >
         <Box className="content">
@@ -228,65 +241,52 @@ export default function Product() {
                   }}
                 />
               </div>
-              <Button></Button>
-              <Box className="fillter-box">
-                <Button
-                  fullWidth
-                  aria-describedby={id}
-                  variant="contained"
-                  className="content-wrapper-search-btn"
-                  onClick={handlePopoverOpen}
-                >
-                  Bộ lọc
-                </Button>
-                <StyledMenu
-                  MenuListProps={{
-                    'aria-labelledby': 'demo-customized-button',
-                  }}
-                  anchorEl={anchorEl}
-                  open={open}
-                  onClose={handlePopoverClose}
-                >
-                  <Box className="fillter-box-wrapper">
-                    <Box className="fillter-box-wrapper-item">
-                      <TextField className="filter-title" disabled value={'Ngày tạo'} />
-                      <LocalizationProvider dateAdapter={AdapterDayjs}>
-                        <DatePicker
-                          value={fromTime}
-                          onChange={(value) => {
-                            setFromTime(value);
-                          }}
-                        />
-                      </LocalizationProvider>
-                      <LocalizationProvider dateAdapter={AdapterDayjs}>
-                        <DatePicker
-                          value={toTime}
-                          onChange={(value) => {
-                            setToTime(value);
-                          }}
-                        />
-                      </LocalizationProvider>
-                    </Box>
-                    <Box className="fillter-box-wrapper-item">
-                      <TextField className="filter-title" disabled value={'Loại trang phục'} />
-                      <Select value={category} onChange={handleChangeCategory}>
-                        <MenuItem value="">Chọn loại trang phục</MenuItem>
-                        {categories?.map((categoryItem, index) => (
-                          <MenuItem key={index} value={categoryItem}>
-                            {categoryItem}
-                          </MenuItem>
-                        ))}
-                      </Select>
-                    </Box>
-                    <Button variant="contained" className="filter-btn" onClick={handleFilter}>
-                      Lọc
-                    </Button>
-                  </Box>
-                </StyledMenu>
-              </Box>
+              {isPendingGetInventory ? (
+                <Fade in={isPendingGetInventory}>
+                  <CircularProgress size={30} />
+                </Fade>
+              ) : (
+                <FormControl>
+                  <InputLabel id="select-inventory">Kho</InputLabel>
+                  <Select
+                    label="Kho"
+                    size="small"
+                    labelId="select-inventory"
+                    value={inventory}
+                    onChange={(e) => setInventory(e.target.value as number)}
+                  >
+                    {inventories?.map((inventory) => (
+                      <MenuItem key={inventory.id} value={inventory?.id}>
+                        {inventory.name}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
+              )}
+              <Filter onFilter={handleFilter}>
+                <React.Fragment>
+                  <DateTimeTextfield fromTime={fromTime} toTime={toTime} title="Ngày tạo" onSetDate={handleSetDate} />
+                  <SelectTextField title="Loại sản phẩm" options={categories} onChange={setCategory} />
+                </React.Fragment>
+              </Filter>
             </Box>
             <ColabTable
-              columns={columns}
+              columns={[
+                ...productColumns,
+                {
+                  field: '',
+                  headerName: '',
+                  headerClassName: 'content-wrapper-table-header',
+                  flex: 1,
+                  renderCell: (item: ProductType) => (
+                    <React.Fragment>
+                      <IconButton onClick={() => handleOpenEditModal(item)}>
+                        <ModeEditIcon color="primary" />
+                      </IconButton>
+                    </React.Fragment>
+                  ),
+                },
+              ]}
               rows={products.map((product, index) => {
                 return {
                   ...product,
@@ -295,23 +295,70 @@ export default function Product() {
                 };
               })}
               metadata={metadata}
-              onceRow={(...rest : any) => <OnceRow {...rest} />}
-              colabRow={(...rest : any) => <ColabRow {...rest} />}
+              onceRow={(...rest: any) => <OnceRow {...rest} />}
+              colabRow={(...rest: any) => <ColabRow {...rest} />}
               onChangePage={handleChangPage}
+              pagination
               className="content-wrapper-table"
-              subTable={(item: ProductType) => (
+              subTable={(subItem: ProductType) => (
                 <SubTable
                   pagination={false}
                   pageTitle="Hàng hóa tương tự"
-                  columns={subColumns}
-                  rows={item.attributes?.map((attribute) => {
-                    return { ...attribute, key: attribute.id };
+                  columns={[
+                    ...productSubColumns,
+                    {
+                      field: '',
+                      headerName: '',
+                      headerClassName: 'content-wrapper-table-header',
+                      flex: 1,
+                      renderCell: (item: ProductAttributeType) => (
+                        <React.Fragment>
+                          <IconButton
+                            onClick={() => {
+                              handleOpenEditAttributeModal(item);
+                            }}
+                          >
+                            <ModeEditIcon color="primary" />
+                          </IconButton>
+                        </React.Fragment>
+                      ),
+                    },
+                  ]}
+                  rows={subItem.attributes?.map((attribute) => {
+                    return { ...attribute, key: attribute.id, productName: subItem.name };
                   })}
                 />
               )}
-              // onRowClick={handleRowClick}
             />
           </Box>
+          <UpdateProductModal
+            detail={editProduct}
+            open={show === 'product'}
+            categories={categories}
+            onImage={setImage}
+            onUpdate={handleUpdateProduct}
+            onClose={handleCloseMOdal}
+            onChangeProductDetail={handleChangeProduct}
+            onChangeAttribute={handleChangeAttribute}
+          />
+          <AttributeModal
+            detail={editAttribute}
+            open={show === 'attribute'}
+            onUpdate={handleUpdateAttribute}
+            onImage={setImage}
+            onClose={handleCloseMOdal}
+            onChangeAttribute={handleChangeEditAttribute}
+          />
+          <Snackbar
+            anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+            open={openAlert}
+            autoHideDuration={2000}
+            onClose={handleCloseAlert}
+          >
+            <Alert onClose={handleCloseAlert} severity={typeAlert} variant="filled" sx={{ width: '100%' }}>
+              {alertMessage}
+            </Alert>
+          </Snackbar>
         </Box>
       </BaseLayout>
     </div>

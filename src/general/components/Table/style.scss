@@ -1,6 +1,9 @@
 .cutome-table{
     width: 100%;
     // border-collapse: separate ;
+    border-collapse: collapse;
+    border-radius: 30px;
+    border-style: hidden; /* hide standard table (collapsed) border */
     cursor: pointer;
     border: 1px solid #ddd;
     border-radius: 6px;
@@ -22,20 +25,5 @@
         text-align: center;
         margin-top: 12px;
     }
-    .drop-down-row {
-        animation: dropdownAnimation 0.5s ease forwards; /* Apply animation */
-
-    }
    
 }
-
-@keyframes dropdownAnimation {
-    from {
-      opacity: 0;
-      transform: translateY(-10px);
-    }
-    to {
-      opacity: 1;
-      transform: translateY(0);
-    }
-  }
