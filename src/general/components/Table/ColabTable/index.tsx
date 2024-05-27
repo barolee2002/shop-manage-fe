@@ -4,6 +4,7 @@ import { ArrowBack as ArrowBackIcon, ArrowForward as ArrowForwardIcon } from '@m
 
 import '../style.scss';
 import { TableProps } from 'src/types/TableType';
+import Loading from '../../Loading';
 
 interface Props extends TableProps {
   subTable: (item: any) => React.ReactElement;
@@ -12,7 +13,7 @@ interface Props extends TableProps {
 }
 
 const ColabTable = (props: Props) => {
-  const { pagination = false } = props;
+  const { pagination = false, loading = false } = props;
   const [show, setShow] = React.useState(0);
   const handleSubTable = (id: any) => {
     show === 0 ? setShow(id) : setShow(0);
@@ -30,7 +31,8 @@ const ColabTable = (props: Props) => {
             ))}
           </TableRow>
         </TableHead>
-        <TableBody>
+        <TableBody className={loading ? 'mh300' : ''}>
+          {loading && <Loading isLoading={loading} size={50} />}
           {props.rows?.map((row) => (
             <React.Fragment key={row.key}>
               {row.subTableRow.length > 1

@@ -14,6 +14,7 @@ interface Props {
     onClick: () => void;
     variant?: Variant;
     color?: Color;
+    disable?: boolean;
   }[];
 }
 const CustomeTopbar = (props: Props) => {
@@ -36,6 +37,7 @@ const CustomeTopbar = (props: Props) => {
               className="add-btn"
               onClick={button.onClick}
               key={index}
+              disabled={button.disable}
             >
               {button.buttonTitle}
             </Button>

@@ -10,20 +10,31 @@ export const productEditSlice = createSlice({
     updateProductEdit: (state, action) => {
       state.data = action.payload;
     },
-    addAttribute: (state, action) => {
+    addAttributeEdit: (state, action) => {
       state.data.attributes.push(action.payload);
     },
     deleteAttribute: (state, action) => {
-      state.data.attributes = state.data.attributes.filter((attribute) => attribute.id !== action.payload)
+      state.data.attributes = state.data.attributes.filter((attribute) => attribute.id !== action.payload);
     },
-    changeValue : (state, action) => {
+    changeValueEditProduct: (state, action) => {
       state.data = {
         ...state.data,
         ...action.payload,
-      }
-    }
+      };
+    },
+    changeAttributeEdit: (state, action) => {
+      console.log(action.payload);
+
+      state.data = {
+        ...state.data,
+        attributes: state.data.attributes.map((attribute, index) => {
+          return index === action.payload.index ? action.payload.attribute : attribute;
+        }),
+      };
+    },
   },
 });
 
-export const { updateProductEdit,addAttribute,deleteAttribute } = productEditSlice.actions;
+export const { updateProductEdit, changeAttributeEdit, addAttributeEdit, deleteAttribute, changeValueEditProduct } =
+  productEditSlice.actions;
 export default productEditSlice.reducer;

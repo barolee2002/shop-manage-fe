@@ -26,6 +26,13 @@
     background-color: #fff;
     border-radius: 6px;
     padding: 24px;
+    .attribute{
+      display: flex;
+      gap: 24px;
+      flex-wrap: wrap;
+      margin-top: 24px;
+      // justify-content: space-between;
+    }
     .extension-setup {
       display: flex;
       margin-top: 24px;
@@ -44,5 +51,30 @@
         }
       }
     }
+  }
+  @media screen and (max-width:700px) {
+    .product-attribute{
+      .extension-setup{
+        display: block;
+        &-item {
+          width: 100%;
+          margin: 12px 0;
+        }
+      }
+    }
+    .product-inf{
+      display: block;
+      &-item{
+        margin: 12px 0;
+        width: 100%;
+        display: block;
+        &-field{
+          width: 100%;
+          padding: 12px 0;
+          margin: 0;
+        }
+      }
+    }
+    
   }
 }

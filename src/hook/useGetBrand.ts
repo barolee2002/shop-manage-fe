@@ -1,6 +1,6 @@
 import React from 'react';
 import axiosClient from 'src/api/axiosClient';
-const useGetBrand = (id: number) : [string[], boolean] => {
+const useGetBrand = (id: number): [string[], boolean] => {
   const [brands, setBrands] = React.useState<string[]>([]);
   const [isPendingGetBrand, setIsPendingGetBrand] = React.useState(true);
   React.useEffect(() => {
@@ -11,7 +11,7 @@ const useGetBrand = (id: number) : [string[], boolean] => {
       .catch((err) => console.log(err));
   }, [id]);
 
-  return [brands,isPendingGetBrand];
+  return [brands, isPendingGetBrand];
 };
 
 export default useGetBrand;

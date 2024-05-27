@@ -6,54 +6,42 @@ import PropTypes from 'prop-types';
 import { getDownloadURL } from 'firebase/storage';
 
 import './style.scss';
-import { Box } from '@mui/material';
-
-// BaseDropzone.propTypes = {
-//   parentCallback: PropTypes.func,
-//   isClear: PropTypes.bool,
-// };
-// BaseDropzone.defaultProps = {
-//   parentCallback: null,
-//   isClear: false,
-// };
+import { Box, fabClasses } from '@mui/material';
 
 interface Props {
-  parentCallback: (image: any) => void;
-  isClear: boolean;
-  once: boolean;
-  parentImage: string;
-  typeImage : string
-  listParentImage: string[];
+  parentCallback?: (image: any) => void;
+  isClear?: boolean;
+  once?: boolean;
+  parentImage?: string;
+  typeImage?: string;
+  listParentImage?: string[];
+  imageKey?: string | number;
 }
 
-function BaseDropzone(props: Partial<Props>) {
-  const { parentCallback, isClear, once } = props;
+function BaseDropzone(props: Props) {
+  const { parentCallback, imageKey, once, parentImage } = props;
   const [images, setImages] = useState<any>([]);
   const [image, setImage] = useState<File | null | string>(null);
-  const [clearImg, setClearImg] = useState(isClear);
   const [isDrapping, setIsDrapping] = useState(false);
+  console.log(parentImage, imageKey);
+  const didMountRef = useRef(false);
   const fileInputRef = useRef<any>(null);
-  useEffect(() => {
-    once ? parentCallback && parentCallback(image) : parentCallback && parentCallback(images);
-  }, [images, image]);
-  // const handleParentImage = async () => {
-  //   props.parentImage &&
-  //     setImage(new File([await (await fetch(props.parentImage)).blob()], 'image.jpg', { type: 'image/jpeg' }));
-  //   props.listParentImage &&
-  //     props.listParentImage.map(async (parentImage) => {
-  //       setImages(new File([await(await fetch(parentImage)).blob()], 'image.jpg', { type: 'image/jpeg' }));
-  //     });
-  // };
-  console.log(props.parentImage);
 
   useEffect(() => {
     setImages([]);
-    setImage(null);
-    props.parentImage && setImage(props.parentImage);
-    // handleParentImage();
-  }, []);
+    setImage(parentImage || null);
+    didMountRef.current= false;
+  }, [imageKey]);
+  useEffect(() => {
+    if (didMountRef.current) {
+      once && typeof image !== 'string'
+        ? parentCallback && parentCallback(image)
+        : parentCallback && parentCallback(images);
+    }
+  }, [images, image]);
   const selectFiles = () => {
     fileInputRef.current !== null && fileInputRef.current.click();
+    didMountRef.current= true;
   };
   const onFileSelect = (e: any) => {
     const files = e.target.files;
@@ -97,66 +85,71 @@ function BaseDropzone(props: Partial<Props>) {
         {isDrapping ? (
           <span>Kéo thả ảnh vào đây</span>
         ) : (
-          <Box>
-            Kéo thả ảnh hoặc{' '}
-            <span className="btn-upload" role="button" onClick={selectFiles}>
-              tải ảnh từ thiết bị
-            </span>
-          </Box>
+          <>
+            {once && parentImage ? (
+              <Box className="image-item m-2">
+                <span
+                  className="delete-img d-flex justify-content-center align-items-center rounded-circle"
+                  onClick={() => {
+                    setImage(null);
+                  }}
+                >
+                  <i className="fa-solid fa-xmark"></i>
+                </span>
+                <img
+                  role="presentation"
+                  src={
+                    // typeof image !== 'string' && image
+                    //   ? URL.createObjectURL(image)
+                    //   : typeof image === 'string' && parentImage && image && image !== ''
+                    //   ? image
+                    //   : ''
+                    parentImage ? parentImage : ''
+                  }
+                  alt={props.typeImage}
+                  onClick={selectFiles}
+                />
+              </Box>
+            ) : (
+              <Box>
+                Kéo thả ảnh hoặc{' '}
+                <span className="btn-upload" role="button" onClick={selectFiles}>
+                  tải ảnh từ thiết bị
+                </span>
+              </Box>
+            )}
+          </>
         )}
         <input className="d-none" type="file" name="file" multiple ref={fileInputRef} onChange={onFileSelect} />
       </Box>
       <Box className="img-list w-100 d-flex justify-content-start align-items-start flex-wrap">
-        {once && image ? (
-          <Box className="image-item m-2">
-            <span
-              className="delete-img d-flex justify-content-center align-items-center rounded-circle"
-              onClick={() => {
-                setImage(null);
-              }}
-            >
-              <i className="fa-solid fa-xmark"></i>
-            </span>
-            <img
-              src={
-                typeof image !== 'string' && image
-                  ? URL.createObjectURL(image)
-                  : typeof image === 'string' && image && image !== ''
-                  ? image
-                  : ''
-              }
-              alt={props.typeImage}
-            />
-          </Box>
-        ) : (
-          <React.Fragment>
-            {props?.listParentImage?.map((image, index) => (
-              <Box className="image-item m-2" key={index}>
-                <span
-                  className="delete-img d-flex justify-content-center align-items-center rounded-circle"
-                  onClick={() => deleteImage(index)}
-                >
-                  <i className="fa-solid fa-xmark"></i>
-                </span>
-                <img src={image} alt="product" />
-              </Box>
-            ))}
-            {images.map((fileImg: any, index: any) => (
-              <Box className="image-item m-2" key={index}>
-                <span
-                  className="delete-img d-flex justify-content-center align-items-center rounded-circle"
-                  onClick={() => deleteImage(index)}
-                >
-                  <i className="fa-solid fa-xmark"></i>
-                </span>
-                <img src={URL.createObjectURL(fileImg)} alt={fileImg.name} />
-              </Box>
-            ))}
-          </React.Fragment>
-        )}
+        <React.Fragment>
+          {props?.listParentImage?.map((image, index) => (
+            <Box className="image-item m-2" key={index}>
+              <span
+                className="delete-img d-flex justify-content-center align-items-center rounded-circle"
+                onClick={() => deleteImage(index)}
+              >
+                <i className="fa-solid fa-xmark"></i>
+              </span>
+              <img src={image} alt="product" />
+            </Box>
+          ))}
+          {images.map((fileImg: any, index: any) => (
+            <Box className="image-item m-2" key={index}>
+              <span
+                className="delete-img d-flex justify-content-center align-items-center rounded-circle"
+                onClick={() => deleteImage(index)}
+              >
+                <i className="fa-solid fa-xmark"></i>
+              </span>
+              <img src={URL.createObjectURL(fileImg)} alt={fileImg.name} />
+            </Box>
+          ))}
+        </React.Fragment>
       </Box>
     </Box>
   );
 }
 
-export default BaseDropzone;
+export default React.memo(BaseDropzone);

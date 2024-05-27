@@ -1,28 +1,15 @@
 /* eslint-disable jsx-a11y/click-events-have-key-events */
 /* eslint-disable import/named */
 
-import React from 'react';
+import React, { useState } from 'react';
 import { useSelector } from 'react-redux';
 import axiosClient from 'src/api/axiosClient';
 import { BaseLayout } from 'src/general/components/BaseLayout';
-import {
-  Box,
-  Button,
-  InputLabel,
-  FormControl,
-  MenuItem,
-  TextField,
-  IconButton,
-  Snackbar,
-  Alert,
-  Fade,
-  CircularProgress,
-} from '@mui/material';
-import { producrSelector } from 'src/redux/selector';
+import { Box, InputLabel, FormControl, MenuItem, TextField, IconButton, Snackbar, Alert } from '@mui/material';
+import { productSelector } from 'src/redux/selector';
 import InputAdornment from '@mui/material/InputAdornment';
 import { Search as SearchIcon, ModeEdit as ModeEditIcon } from '@mui/icons-material';
 import { changeProduct, updateProduct } from './ProductSlice';
-import './style.scss';
 import { useDispatch } from 'react-redux';
 import { Dayjs } from 'dayjs';
 import { metaData } from 'src/types/MetaData';
@@ -36,44 +23,42 @@ import OnceRow from 'src/general/components/Table/Product/OnceRow';
 import ColabRow from 'src/general/components/Table/Product/ColabRow';
 import UpdateProductModal from 'src/general/components/Modal/UpdateProductModal';
 import { productColumns, productSubColumns } from 'src/general/components/Table/TableColumn/TableColumns';
-import { uploadImage } from 'src/utils/upLoadImage';
+import useUploadImage from 'src/hook/upLoadImage';
 import AttributeModal from 'src/general/components/Modal/AttributeModal';
 import Filter from 'src/general/components/Filter';
-import DateTimeTextfield from 'src/general/components/Filter/DateTimeTextfield';
-import SelectTextField from 'src/general/components/Filter/SelectTextField';
-import Select, { SelectChangeEvent } from '@mui/material/Select';
-import { inventoryType } from 'src/types/inventory';
+import DateTimeField from 'src/general/components/Filter/DateTimefield';
+import SelectField from 'src/general/components/Filter/SelectField';
+import Select from '@mui/material/Select';
 import { testuser } from 'src/utils/test';
 import useGetInventory from 'src/hook/useGetInventory';
 import useGetCategory from 'src/hook/useGetCategory';
+import { PATH_PRODUCT } from 'src/general/constants/path';
+import { updateProductEdit } from '../ProductCreating/productEditSlice';
+import Loading from 'src/general/components/Loading';
+import 'src/utils/screenBaseStyle/baseScreenStyle.scss';
+import { openAlert } from 'src/general/components/BaseLayout/alertSlice';
+
 
 export default function Product() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const products = useSelector(producrSelector);
-  const [alertMessage, setAlertMessage] = React.useState('');
-  const [openAlert, setOpenAlert] = React.useState(false);
-  const [typeAlert, setTypeAlert] = React.useState<any>('success');
-  const [categories, isPendingGetCategories] = useGetCategory(testuser.storeId);
-  const [category, setCategory] = React.useState('');
-  const [metadata, setMetadata] = React.useState<metaData>({} as metaData);
-  const [inventory, setInventory] = React.useState(testuser.storeId);
-  const [searchString, setSearchString] = React.useState('');
-  const [show, setShow] = React.useState('');
-  const [editAttribute, setEditAttribute] = React.useState<ProductAttributeType>({} as ProductAttributeType);
-  const [image, setImage] = React.useState<File | null>(null);
+  const products = useSelector(productSelector);
+  const [categories] = useGetCategory(testuser.storeId);
+  const [category, setCategory] = useState('');
+  const [metadata, setMetadata] = useState<metaData>({} as metaData);
+  const [inventory, setInventory] = useState(testuser.storeId);
+  const [searchString, setSearchString] = useState('');
+  const [show, setShow] = useState('');
+  const [loading, setLoading] = useState<boolean>(false);
+  const [uploadImage] = useUploadImage();
+  const [editAttribute, setEditAttribute] = useState<ProductAttributeType>({} as ProductAttributeType);
+  const [image, setImage] = useState<File | null>(null);
   const [inventories, isPendingGetInventory] = useGetInventory(testuser.storeId);
-  const [editProduct, setEditProduct] = React.useState<ProductType>({} as ProductType);
+  const [editProduct, setEditProduct] = useState<ProductType>({} as ProductType);
   const debounceString = useDebounce(searchString, 500);
-  const [fromTime, setFromTime] = React.useState<Dayjs | null>(null);
-  const [toTime, setToTime] = React.useState<Dayjs | null>(null);
-  const [page, setPage] = React.useState(1);
-  const handleCloseAlert = (event: React.SyntheticEvent | Event, reason?: string) => {
-    if (reason === 'clickaway') {
-      return;
-    }
-    setOpenAlert(false);
-  };
+  const [fromTime, setFromTime] = useState<Dayjs | null>(null);
+  const [toTime, setToTime] = useState<Dayjs | null>(null);
+  const [page, setPage] = useState(1);
   const handleCloseMOdal = () => {
     setShow('');
     setEditProduct({} as ProductType);
@@ -111,6 +96,7 @@ export default function Product() {
     });
   };
   const fetchData = async () => {
+    setLoading(true);
     const fromDate =
       fromTime !== null
         ? `${fromTime.toDate().getFullYear()}-${fromTime.toDate().getMonth() + 1}-${fromTime.toDate().getDate()}`
@@ -123,7 +109,7 @@ export default function Product() {
       // const fromDate =
       const response = await axiosClient.get(`product/all`, {
         params: {
-          userId: testuser.id,
+          storeId: testuser.storeId,
           searchString: searchString,
           category: category,
           page: page,
@@ -132,15 +118,11 @@ export default function Product() {
           toTime: toDate,
         },
       });
-      
-      setMetadata({
-        elements: response.data.elements,
-        totalElements: response.data.totalElements,
-        totalPages: response.data.totalPages,
-      });
-      // setPage(1);
+
+      setMetadata(response.data.metaData);
       page > response.data.totalPages && setPage(1);
       dispatch(updateProduct(response.data.data));
+      setLoading(false);
     } catch (err) {
       console.log(err);
     }
@@ -158,8 +140,7 @@ export default function Product() {
       await axiosClient.put(`product/updating/${editProduct.id}`, { ...editProduct, imageLink: link });
       dispatch(changeProduct({ ...editProduct, imageLink: link }));
       setShow('');
-      setOpenAlert(true);
-      setAlertMessage('Cập nhập sẩn phẩm thành công');
+      dispatch(openAlert({ message: 'Cập nhập sẩn phẩm thành công', type: 'success' }));
     } catch (err) {
       console.log(err);
     }
@@ -176,8 +157,7 @@ export default function Product() {
       await axiosClient.put(`product-attributes/updating/${editAttribute.id}`, { ...editAttribute, imageLink: link });
       // dispatch(changeProduct({ ...editProduct, imageLink: link }));
       setShow('');
-      setOpenAlert(true);
-      setAlertMessage('Cập nhập sẩn phẩm thành công');
+      dispatch(openAlert({ message: 'Cập nhập sẩn phẩm thành công', type: 'success' }));
     } catch (err) {
       console.log(err);
     }
@@ -185,7 +165,7 @@ export default function Product() {
   const handleFilter = () => {
     fetchData();
   };
-  const handleChangPage = (event: React.ChangeEvent<unknown>, value: number) => {
+  const handleChangPage = (_: any, value: number) => {
     setPage(value);
   };
   const handleOpenEditModal = (item: ProductType) => {
@@ -203,16 +183,18 @@ export default function Product() {
   console.log(fromTime, toTime);
 
   const handleAddProduct = () => {
-    navigate(`creating`, {
+    dispatch(updateProductEdit({} as ProductType));
+    navigate(PATH_PRODUCT.PRODUCT_CREATE_PATH, {
       state: {
         pageTitle: 'Quay về trang danh sách sản phẩm',
         typeTitle: 'navigate',
-        onTitleClick: '/admin/products',
+        onTitleClick: PATH_PRODUCT.PRODUCT_LIST_PATH,
+        typeFeature: 'create',
       },
     });
   };
   return (
-    <div className="product-list">
+    <div className="list">
       <BaseLayout
         topbarChildren={
           <CustomeTopbar
@@ -241,32 +223,37 @@ export default function Product() {
                   }}
                 />
               </div>
-              {isPendingGetInventory ? (
-                <Fade in={isPendingGetInventory}>
-                  <CircularProgress size={30} />
-                </Fade>
-              ) : (
-                <FormControl>
-                  <InputLabel id="select-inventory">Kho</InputLabel>
-                  <Select
-                    label="Kho"
-                    size="small"
-                    labelId="select-inventory"
-                    value={inventory}
-                    onChange={(e) => setInventory(e.target.value as number)}
-                  >
-                    {inventories?.map((inventory) => (
-                      <MenuItem key={inventory.id} value={inventory?.id}>
-                        {inventory.name}
-                      </MenuItem>
-                    ))}
-                  </Select>
-                </FormControl>
-              )}
+              <div className="relative-block">
+                {isPendingGetInventory ? (
+                  <Loading isLoading={isPendingGetInventory} />
+                ) : (
+                  <FormControl>
+                    <InputLabel id="select-inventory">Kho</InputLabel>
+                    <Select
+                      label="Kho"
+                      size="small"
+                      labelId="select-inventory"
+                      value={inventory}
+                      onChange={(e) => setInventory(e.target.value as number)}
+                    >
+                      {inventories?.map((inventory) => (
+                        <MenuItem key={inventory.id} value={inventory?.id}>
+                          {inventory.name}
+                        </MenuItem>
+                      ))}
+                    </Select>
+                  </FormControl>
+                )}
+              </div>
               <Filter onFilter={handleFilter}>
                 <React.Fragment>
-                  <DateTimeTextfield fromTime={fromTime} toTime={toTime} title="Ngày tạo" onSetDate={handleSetDate} />
-                  <SelectTextField title="Loại sản phẩm" options={categories} onChange={setCategory} />
+                  <DateTimeField fromTime={fromTime} toTime={toTime} title="Ngày tạo" onSetDate={handleSetDate} />
+                  <SelectField
+                    value={category}
+                    title="Loại sản phẩm"
+                    options={categories.map((category) => ({ value: category, name: category }))}
+                    onChange={setCategory}
+                  />
                 </React.Fragment>
               </Filter>
             </Box>
@@ -299,6 +286,7 @@ export default function Product() {
               colabRow={(...rest: any) => <ColabRow {...rest} />}
               onChangePage={handleChangPage}
               pagination
+              loading={loading}
               className="content-wrapper-table"
               subTable={(subItem: ProductType) => (
                 <SubTable
@@ -349,16 +337,6 @@ export default function Product() {
             onClose={handleCloseMOdal}
             onChangeAttribute={handleChangeEditAttribute}
           />
-          <Snackbar
-            anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
-            open={openAlert}
-            autoHideDuration={2000}
-            onClose={handleCloseAlert}
-          >
-            <Alert onClose={handleCloseAlert} severity={typeAlert} variant="filled" sx={{ width: '100%' }}>
-              {alertMessage}
-            </Alert>
-          </Snackbar>
         </Box>
       </BaseLayout>
     </div>

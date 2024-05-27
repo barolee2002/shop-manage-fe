@@ -18,12 +18,18 @@
         
 
     }
+    .MuiTableBody-root{
+        position: relative;
+    }
     &-pagination{
         width: 100%;
         display: flex;
         justify-content: center;
         text-align: center;
         margin-top: 12px;
+    }
+    .mh300{
+        height: 300px;
     }
    
 }

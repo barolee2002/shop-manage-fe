@@ -6,7 +6,7 @@ import './style.scss';
 import axiosClient from 'src/api/axiosClient';
 import { style } from 'src/utils/CustomStyle/StyleModal';
 import BaseDropzone from '../../DropZone';
-import { uploadImage } from 'src/utils/upLoadImage';
+import { uploadImage } from 'src/hook/upLoadImage';
 
 interface Props {
   detail: ProductType;

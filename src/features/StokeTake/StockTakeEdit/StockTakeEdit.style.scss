@@ -1,0 +1,15 @@
+.stock-take-edit {
+    .base-info{
+        .stock-take-edit-code{
+            margin-bottom: 24px;
+        }
+        background-color: #fff;
+        padding: 16px;
+        border-radius: 6px;
+        .fillter-box-wrapper-item {
+            // grid-template-columns: auto auto;
+            display: flex;
+
+        }
+    }
+}

@@ -14,3 +14,11 @@
     display: flex;
     gap : 0 24px;
 }
+@media screen and (max-width : 700px) {
+    .page-title {
+        font-size: 16px;
+        .MuiSvgIcon-fontSizeMedium {
+            font-size: 20px;
+        }
+    }
+}

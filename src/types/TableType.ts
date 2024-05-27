@@ -19,7 +19,8 @@ export interface TableProps {
   onRowClick?: (item: any) => void;
   className?: string;
   onCellClick?: (field: string, item: any) => void;
-  pagination ?: boolean;
+  pagination?: boolean;
+  loading?: boolean;
 }
 
 export interface unknowType {

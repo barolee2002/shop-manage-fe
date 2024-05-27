@@ -1,24 +1,39 @@
+import { metaData } from './MetaData';
+
+export type FilterProductType = {
+  storeId: number;
+  searchString: string;
+  category: string;
+  page: number;
+  inventoryId: number;
+  fromTime: string;
+  toTime: string;
+};
 export type ProductAttributeType = {
   id: number;
   code: string;
-  productName : string;
+  productName: string;
   costPrice: number;
   sellPrice: number;
   productId: number;
   imageLink: string;
-  quantity : number;
+  quantity: number;
   otherAttribute: {
     name: string;
     value: string;
   }[];
   inventoryList: InventoryCost[];
 };
+export type ProductList = {
+  data: ProductType[];
+  metadata: metaData;
+};
 export type ProductType = {
   id: number;
   key: number;
   name: string;
   status: number;
-  ownerId: number;
+  storeId: number;
   brand: string;
   category: string;
   minPrice: number;

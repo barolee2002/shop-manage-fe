@@ -1,10 +1,15 @@
 import React from 'react';
 import Sidebar from '../Sidebar';
 import { Topbar } from '../Topbar';
-import { Box, Container, Fab, Fade } from '@mui/material';
+import { Box, Container, Fab, Fade, Snackbar, Alert } from '@mui/material';
 import useScrollTrigger from '@mui/material/useScrollTrigger';
 import { KeyboardArrowUp as KeyboardArrowUpIcon } from '@mui/icons-material';
 import { AppConstants } from '../../constants/AppConstants';
+import './Baselayout.Style.scss';
+import { useDispatch } from 'react-redux';
+import { useSelector } from 'react-redux';
+import { alertSelector } from 'src/redux/selector';
+import { closeAlert } from './alertSlice';
 interface Props {
   window?: () => Window;
   children: React.ReactElement;
@@ -38,13 +43,33 @@ function ScrollTop(props: Props) {
   );
 }
 export const BaseLayout = (props: Props) => {
+  const dispatch = useDispatch();
+  const alert = useSelector(alertSelector);
+console.log(alert);
+
+  const handleCloseAlert = (event: React.SyntheticEvent | Event, reason?: string) => {
+    if (reason === 'clickaway') {
+      return;
+    }
+    dispatch(closeAlert());
+  };
   return (
     <Box sx={{ display: 'flex' }}>
       <Sidebar />
-      <div className="d-flex flex-column w-100" style={{ position : 'relative'}}>
+      <div className="d-flex flex-column base-content" style={{ position: 'relative' }}>
         <Topbar>{props.topbarChildren}</Topbar>
         <Container sx={{ marginTop: `${AppConstants.sidebarHeight}px` }} maxWidth="xl">
           {props.children}
+          <Snackbar
+            anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
+            open={alert.open}
+            autoHideDuration={2000}
+            onClose={handleCloseAlert}
+          >
+            <Alert onClose={handleCloseAlert} severity={alert.type} variant="filled" sx={{ width: '100%' }}>
+              {alert.message}
+            </Alert>
+          </Snackbar>
         </Container>
       </div>
       <ScrollTop {...props}>

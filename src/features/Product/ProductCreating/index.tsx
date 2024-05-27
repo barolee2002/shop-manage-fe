@@ -1,57 +1,195 @@
-import { Box, TextField, Tabs, Tab, Autocomplete, Button, IconButton } from '@mui/material';
+import {
+  Box,
+  TextField,
+  Fade,
+  Tabs,
+  Select,
+  FormControl,
+  MenuItem,
+  InputLabel,
+  CircularProgress,
+  Tab,
+  Autocomplete,
+  Button,
+  IconButton,
+  InputAdornment,
+} from '@mui/material';
 import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useLocation, useNavigate } from 'react-router';
-
 import { BaseLayout } from 'src/general/components/BaseLayout';
 import CustomeTopbar from 'src/general/components/Topbar/CustomeTopbar';
 import './productCreatingStyle.scss';
 import BaseDropzone from 'src/general/components/DropZone';
 import { productEditSelector } from 'src/redux/selector';
 import { ProductAttributeType, ProductType } from 'src/types/Product';
-import useCategory from 'src/hook/useGetCategory';
+import useGetCategory from 'src/hook/useGetCategory';
 import { testuser } from 'src/utils/test';
 import useBrand from 'src/hook/useGetBrand';
+import { NumericFormat } from 'react-number-format';
 import { Add as AddIcon, Delete as DeleteIcon } from '@mui/icons-material';
+import { addAttributeEdit, changeAttributeEdit, changeValueEditProduct, updateProductEdit } from './productEditSlice';
+import { initialInventoryCost, initialProduct, initialProductAttribute } from 'src/utils/initialValue';
+import useGetInventory from 'src/hook/useGetInventory';
+import useUploadImage from 'src/hook/upLoadImage';
+import getImageUrl from 'src/utils/getImageUrl';
+import getImageFile from 'src/utils/getImageFile';
+import useCreateProduct from 'src/hook/product/useCreateProduct';
+import { PATH_PRODUCT } from 'src/general/constants/path';
+import useUpdateProduct from 'src/hook/product/useUpdateProduct';
 
-interface OtherAttributes {
-  name: string;
-  value: string;
-}
 const ProductCreating = () => {
   const location = useLocation();
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const { pageTitle, typeTitle, onTitleClick } = location.state;
-  const productEdit = useSelector(productEditSelector);
-  const [categories, isPendingGetCategories] = useCategory(testuser.storeId);
-  const [brands, isPendingGetBrand] = useBrand(testuser.storeId);
-  const [ortherAttributes, setOtherAttributes] = React.useState<OtherAttributes[]>([{ name: '', value: '' }]);
+  const { pageTitle, typeTitle, onTitleClick, typeFeature } = location.state;
+  const productEdit: ProductType = useSelector(productEditSelector);
+  const [categories] = useGetCategory(testuser.storeId);
+  const [inventories, isPendingGetInventory] = useGetInventory(testuser.storeId);
+  const [brands] = useBrand(testuser.storeId);
+  const [updateProduct, isPendingUpdateProduct] = useUpdateProduct();
+  const [createProduct, isPendingCreateProduct] = useCreateProduct();
+  const [uploadImage, isPendingUploadImage] = useUploadImage();
+  const [attribute, setAttribute] = React.useState<ProductAttributeType>(
+    initialProductAttribute as ProductAttributeType
+  );
   const [tabValue, setTabValue] = React.useState(0);
   const [attributeNames, setAttributeNames] = React.useState<string[]>([]);
   const handleBackPage = React.useCallback(() => {
     navigate(`${onTitleClick}`);
   }, [onTitleClick]);
+
   React.useEffect(() => {
-    
-    productEdit.attributes && setOtherAttributes(productEdit.attributes[tabValue].otherAttribute);
+    if (Object.keys(productEdit).length === 0 && productEdit.constructor === Object) {
+      dispatch(updateProductEdit(initialProduct));
+    }
   }, [productEdit]);
-  const handleCreatOrUpdateProduct = () => {};
+
+  React.useEffect(() => {
+    productEdit.attributes && setAttribute(productEdit.attributes[tabValue]);
+  }, [tabValue]);
+
   const handleAddOtherAttribute = () => {
-    setOtherAttributes([...ortherAttributes, { name: '', value: '' }]);
+    setAttribute(
+      (prev: ProductAttributeType) =>
+        ({ ...prev, otherAttribute: [...prev.otherAttribute, { name: '', value: '' }] }) as ProductAttributeType
+    );
+  };
+
+  const handleAddInventory = () => {
+    setAttribute(
+      (prev: ProductAttributeType) =>
+        ({ ...prev, inventoryList: [...prev.inventoryList, initialInventoryCost] }) as ProductAttributeType
+    );
   };
   const handleSetOtherAttribute = (attributeIndex: number, title: string, value: string | null) => {
-    setOtherAttributes(() => {
-      return ortherAttributes.map((attribute, index) => {
+    setAttribute((prev: ProductAttributeType) => ({
+      ...prev,
+      otherAttribute: prev.otherAttribute.map((attribute, index) => {
         return index === attributeIndex ? { ...attribute, [title]: value } : attribute;
-      });
-    });
+      }),
+    }));
+  };
+  const handleSetInventory = (inventoryIndex: number, title: string, value: any) => {
+    setAttribute((prev: ProductAttributeType) => ({
+      ...prev,
+      inventoryList: prev.inventoryList.map((inventory, index) => {
+        return index === inventoryIndex ? { ...inventory, [title]: value } : inventory;
+      }),
+    }));
   };
   const handleChangeName = (value: string | null) => {
     setAttributeNames(() => {
       return value ? [...attributeNames, value] : attributeNames;
     });
   };
+  const handleDeleteOtherAttribute = (indexNumber: number) => {
+    setAttribute((prev: ProductAttributeType) => ({
+      ...prev,
+      otherAttribute: prev.otherAttribute.filter((_, index) => index !== indexNumber),
+    }));
+  };
+  const handleDeleteInventory = (indexNumber: number) => {
+    setAttribute((prev: ProductAttributeType) => ({
+      ...prev,
+      inventoryList: prev.inventoryList.filter((_, index) => index !== indexNumber),
+    }));
+  };
+  const handleChangeAttribute = (title: string, value: string) => {
+    setAttribute((prev: ProductAttributeType) => ({
+      ...prev,
+      [title]: value,
+    }));
+  };
+  const handleAddAttribute = () => {
+    dispatch(addAttributeEdit(initialProductAttribute));
+  };
+  const handleChangeTab = (value: number) => {
+    dispatch(
+      changeAttributeEdit({
+        index: tabValue,
+        attribute: attribute,
+      })
+    );
+    setTabValue(value);
+  };
+  const fixDataPost = React.useMemo(
+    () => async (productEdit: ProductType, attribute: ProductAttributeType) => {
+      const link = productEdit.imageLink
+        ? await uploadImage(await getImageFile(productEdit.imageLink, `${testuser.storeId}/${productEdit.name}`))
+        : '';
+      const attributes = await Promise.all(
+        productEdit.attributes.map(async (attribute) => ({
+          ...attribute,
+          imageLink: attribute.imageLink
+            ? await uploadImage(await getImageFile(attribute.imageLink, `${testuser.storeId}/${productEdit.name}`))
+            : '',
+        }))
+      );
+
+      const newData: ProductAttributeType = {
+        ...attribute,
+        imageLink: attribute.imageLink
+          ? ((await uploadImage(
+              await getImageFile(attribute.imageLink, `${testuser.storeId}/${productEdit.name}`)
+            )) as string)
+          : '',
+      };
+      const data = {
+        ...productEdit,
+        imageLink: link as string,
+        storeId: testuser.storeId,
+        attributes: attributes.map((oldAttribute, index) => {
+          return index === tabValue ? newData : oldAttribute;
+        }) as ProductAttributeType[],
+      };
+      return data;
+    },
+    [productEdit, attribute]
+  );
+  const handleUpdateProduct = async () => {
+    const datapost = await fixDataPost(productEdit, attribute);
+    updateProduct(datapost)
+      .then((res: ProductType) => {
+        dispatch(updateProductEdit(res));
+        return res;
+      })
+      .then((res: ProductType) => navigate(PATH_PRODUCT.PRODUCT_DETAIL_PATH.replace(':id', res.id.toString())));
+  };
+  const handleCreateProduct = async () => {
+    const datapost = await fixDataPost(productEdit, attribute);
+    createProduct(datapost)
+      .then((res: ProductType) => {
+        dispatch(updateProductEdit(res));
+        return res;
+      })
+      .then((res: ProductType) => navigate(PATH_PRODUCT.PRODUCT_DETAIL_PATH.replace(':id', res.id.toString())));
+  };
+  const handleChangeAttributeImage = React.useCallback((image: File) => {
+    handleChangeAttribute('imageLink', getImageUrl(image));
+  }, []);
+  console.log(isPendingCreateProduct && isPendingUploadImage);
+
   return (
     <BaseLayout
       topbarChildren={
@@ -59,10 +197,25 @@ const ProductCreating = () => {
           pageTitle={pageTitle ? pageTitle : 'Chi tiết sản phẩm'}
           typeTitle={typeTitle ? typeTitle : 'text'}
           onTitleClick={handleBackPage}
-          buttonGroup={[
-            { buttonTitle: 'Hủy', onClick: handleBackPage, color: 'error' },
-            { buttonTitle: 'Cập nhập sản phẩm', onClick: handleCreatOrUpdateProduct },
-          ]}
+          buttonGroup={
+            typeFeature === 'create'
+              ? [
+                  { buttonTitle: 'Hủy', onClick: handleBackPage, color: 'error' },
+                  {
+                    buttonTitle: 'Tạo sản phẩm',
+                    onClick: handleCreateProduct,
+                    disable: isPendingCreateProduct || isPendingUploadImage,
+                  },
+                ]
+              : [
+                  { buttonTitle: 'Hủy', onClick: handleBackPage, color: 'error' },
+                  {
+                    buttonTitle: 'Cập nhập sản phẩm',
+                    onClick: handleUpdateProduct,
+                    disable: isPendingUpdateProduct || isPendingUploadImage,
+                  },
+                ]
+          }
         />
       }
     >
@@ -78,8 +231,11 @@ const ProductCreating = () => {
                   fullWidth
                   placeholder="Nhập tên sản phẩm"
                   label="Tên sản phẩm"
-                  value={productEdit.name}
+                  value={productEdit.name || ''}
                   className="product-inf-item-field-input"
+                  onChange={(e) => {
+                    dispatch(changeValueEditProduct({ name: e.target.value }));
+                  }}
                 />
               </Box>
               <Box className="product-inf-item-field">
@@ -88,9 +244,14 @@ const ProductCreating = () => {
                   placeholder="Nhập mã sản phẩm"
                   label="Mã sản phẩm"
                   value={
-                    productEdit.attributes && productEdit?.attributes.length === 1 ? productEdit.attributes[0].code : ''
+                    productEdit.attributes && productEdit?.attributes.length === 1
+                      ? productEdit.attributes[0].code
+                      : 'Hàng nhiều loại' || ''
                   }
                   className="product-inf-item-field-input"
+                  onChange={(e) => {
+                    dispatch(changeValueEditProduct({ name: e.target.value }));
+                  }}
                 />
               </Box>
               <Box className="product-inf-item-field">
@@ -99,9 +260,19 @@ const ProductCreating = () => {
                   id="combo-box-demo"
                   options={categories}
                   fullWidth
-                  value={productEdit.category}
-                  onChange={() => {}}
-                  renderInput={(params) => <TextField {...params} label="Loại sản phẩm" />}
+                  value={productEdit.category || null}
+                  onChange={(_, value) => {
+                    dispatch(changeValueEditProduct({ category: value }));
+                  }}
+                  renderInput={(params) => (
+                    <TextField
+                      {...params}
+                      label="Loại sản phẩm"
+                      onChange={(e) => {
+                        dispatch(changeValueEditProduct({ category: e.target.value }));
+                      }}
+                    />
+                  )}
                 />
               </Box>
               <Box className="product-inf-item-field">
@@ -110,28 +281,43 @@ const ProductCreating = () => {
                   id="combo-box-demo"
                   options={brands}
                   fullWidth
-                  value={productEdit.brand}
-                  onChange={() => {}}
-                  renderInput={(params) => <TextField {...params} label="Thương hiệu" />}
+                  value={productEdit.brand || null}
+                  onChange={(_, value) => {
+                    dispatch(changeValueEditProduct({ brand: value }));
+                  }}
+                  renderInput={(params) => (
+                    <TextField
+                      {...params}
+                      label="Thương hiệu"
+                      onChange={(e) => {
+                        dispatch(changeValueEditProduct({ brand: e.target.value }));
+                      }}
+                    />
+                  )}
                 />
               </Box>
             </Box>
             <Box className="product-inf-item">
-              <BaseDropzone />
+              <BaseDropzone
+                imageKey={tabValue}
+                once
+                parentImage={productEdit.imageLink ? productEdit.imageLink : ''}
+                parentCallback={(image: File) => dispatch(changeValueEditProduct({ imageLink: getImageUrl(image) }))}
+              />
             </Box>
           </Box>
         </Box>
         <Box className="product-attribute">
           <div className="sub-header">
             <p className="sub-header-title">Thiết lập mở rộng</p>
-            <Button variant="outlined">
-              <AddIcon /> Thêm biến thể
+            <Button variant="outlined" onClick={handleAddAttribute}>
+              <AddIcon fontSize="inherit" /> Thêm biến thể
             </Button>
           </div>
           <Box>
-            <Tabs value={tabValue} aria-label="basic tabs example">
+            <Tabs value={tabValue} aria-label="basic tabs example" onChange={(_, value) => handleChangeTab(value)}>
               {productEdit.attributes &&
-                productEdit.attributes.map((attribute, index) => (
+                productEdit.attributes.map((_, index) => (
                   <Tab
                     label={`Biến thể ${index + 1}`}
                     key={index}
@@ -141,21 +327,40 @@ const ProductCreating = () => {
                 ))}
             </Tabs>
           </Box>
+
+          <Box className="attribute">
+            <Box className="attribute-item">
+              <TextField
+                placeholder="Nhập mã sản phẩm"
+                value={attribute.code}
+                onChange={(e) => handleChangeAttribute('code', e.target.value)}
+              />
+            </Box>
+            <Box className="attribute-item">
+              <BaseDropzone
+                imageKey={tabValue}
+                once
+                parentImage={attribute.imageLink}
+                parentCallback={handleChangeAttributeImage}
+              />
+            </Box>
+          </Box>
           <Box className="extension-setup">
             <Box className="extension-setup-item">
-              {ortherAttributes &&
-                ortherAttributes.map((attribute, index) => (
+              {attribute.otherAttribute &&
+                attribute.otherAttribute.map((attribute, index) => (
                   <Box key={index} className="extension-setup-item-row">
                     <Autocomplete
                       disablePortal
                       id="combo-box-demo"
                       options={attributeNames}
+                      isOptionEqualToValue={(option, value) => option.valueOf === value.valueOf}
                       fullWidth
-                      value={attribute.name}
+                      value={attribute.name ? attribute.name : ''}
                       onChange={(_, value: string | null) => {
-                        handleChangeName(value);
                         handleSetOtherAttribute(index, 'name', value);
                       }}
+                      sx={{ width: '40%' }}
                       renderInput={(params) => (
                         <TextField
                           {...params}
@@ -167,20 +372,91 @@ const ProductCreating = () => {
                         />
                       )}
                     />
-                    <TextField value={attribute.name} label="Tên thuộc tính" />
-                    <TextField value={attribute.value} label="Giá trị thuộc tính" />
-                    <IconButton>
-                      <DeleteIcon />
+                    <TextField
+                      value={attribute.value}
+                      label="Giá trị thuộc tính"
+                      onChange={(e) => handleSetOtherAttribute(index, 'value', e.target.value)}
+                    />
+                    <IconButton size="large" onClick={() => handleDeleteOtherAttribute(index)}>
+                      <DeleteIcon fontSize="inherit" />
                     </IconButton>
                   </Box>
                 ))}
               <Button variant="outlined" onClick={handleAddOtherAttribute}>
-                <AddIcon /> Thêm thuộc tính
+                <AddIcon fontSize="inherit" /> Thêm thuộc tính
               </Button>
             </Box>
             <Box className="extension-setup-item">
-              <Button variant="outlined">
-                <AddIcon /> Thêm thuộc tính
+              {attribute.inventoryList &&
+                attribute.inventoryList.map((inventory, index) => (
+                  <Box key={index} className="extension-setup-item-row">
+                    {isPendingGetInventory ? (
+                      <Fade in={isPendingGetInventory}>
+                        <CircularProgress size={30} />
+                      </Fade>
+                    ) : (
+                      <FormControl sx={{ width: '40%' }}>
+                        <InputLabel id="select-inventory">Kho</InputLabel>
+                        <Select
+                          label="Kho"
+                          labelId="select-inventory"
+                          value={inventory.inventory.id ? inventory.inventory.id : -1}
+                          onChange={(e) =>
+                            handleSetInventory(
+                              index,
+                              'inventory',
+                              inventories.find((inventory) => inventory.id === (e.target.value as number))
+                            )
+                          }
+                        >
+                          <MenuItem value={-1}>Chọn kho</MenuItem>
+                          {inventories?.map((inventory) => (
+                            <MenuItem key={inventory.id} value={inventory.id}>
+                              {inventory.name}
+                            </MenuItem>
+                          ))}
+                        </Select>
+                      </FormControl>
+                    )}
+                    <NumericFormat
+                      thousandSeparator=","
+                      customInput={TextField}
+                      value={inventory.costPrice === 0 ? null : inventory.costPrice}
+                      label="Giá nhập"
+                      InputProps={{
+                        endAdornment: (
+                          <InputAdornment position="end">
+                            <p>đ</p>
+                          </InputAdornment>
+                        ),
+                      }}
+                      onChange={(e) =>
+                        handleSetInventory(index, 'costPrice', parseInt(e.target.value.replace(/,/g, '')))
+                      }
+                    />
+                    <NumericFormat
+                      thousandSeparator=","
+                      customInput={TextField}
+                      value={inventory.sellPrice === 0 ? null : inventory.sellPrice}
+                      label="Giá bán"
+                      InputProps={{
+                        endAdornment: (
+                          <InputAdornment position="end">
+                            <p>đ</p>
+                          </InputAdornment>
+                        ),
+                      }}
+                      onChange={(e) =>
+                        handleSetInventory(index, 'sellPrice', parseInt(e.target.value.replace(/,/g, '')))
+                      }
+                    />
+                    <IconButton size="large" onClick={() => handleDeleteInventory(index)}>
+                      <DeleteIcon fontSize="inherit" />
+                    </IconButton>
+                  </Box>
+                ))}
+              <Button variant="outlined" onClick={handleAddInventory}>
+                <AddIcon fontSize="inherit" /> Thêm thuộc tính
               </Button>
             </Box>
           </Box>

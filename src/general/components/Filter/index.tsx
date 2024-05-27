@@ -21,6 +21,10 @@ const FilterButton = (props : Props) => {
   const handlePopoverClose = () => {
     setAnchorEl(null);
   };
+  const handleFilter = () => {
+    props.onFilter();
+    setAnchorEl(null);
+  }
   return (
     <Box className="fillter-box">
       <Button
@@ -42,7 +46,7 @@ const FilterButton = (props : Props) => {
       >
         <Box className="fillter-box-wrapper">
           {props.children}
-          <Button variant="contained" className="filter-btn" onClick={props.onFilter}>
+          <Button variant="contained" className="filter-btn" onClick={handleFilter}>
             Lọc
           </Button>
         </Box>

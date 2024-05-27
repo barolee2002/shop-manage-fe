@@ -3,3 +3,13 @@ export type metaData = {
   totalElements: number;
   totalPages: number;
 };
+
+export type PaymentType = {
+  type: string,
+  field: string,
+}
+export type AlertType = {
+  open: boolean;
+  message: string;
+  type: any;
+}

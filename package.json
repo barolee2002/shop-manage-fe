@@ -36,10 +36,12 @@
         "g": "^2.0.1",
         "moment": "^2.29.4",
         "query-string": "^8.1.0",
+        "react-number-format": "^5.3.4",
         "react-redux": "^9.0.4",
         "react-router": "^6.17.0",
         "react-router-dom": "^6.17.0",
-        "sass": "^1.63.6"
+        "sass": "^1.63.6",
+        "uuid": "^9.0.1"
     },
     "devDependencies": {
         "@types/lodash-es": "^4.17.8",
@@ -47,6 +49,7 @@
         "@types/react": "^18.0.37",
         "@types/react-dom": "^18.0.11",
         "@types/react-redux": "^7.1.25",
+        "@types/uuid": "^9.0.8",
         "@typescript-eslint/eslint-plugin": "^6.4.0",
         "@typescript-eslint/parser": "^6.4.0",
         "@vitejs/plugin-react": "^4.0.4",

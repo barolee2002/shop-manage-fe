@@ -1,7 +1,7 @@
 import React from 'react';
 import { useLocation, useNavigate, useParams } from 'react-router';
 import { BaseLayout } from 'src/general/components/BaseLayout';
-import {  Add as AddIcon } from '@mui/icons-material';
+import { Add as AddIcon } from '@mui/icons-material';
 import './productDetailStyle.scss';
 import { Box, Button, TextField } from '@mui/material';
 import axiosClient from 'src/api/axiosClient';
@@ -15,7 +15,7 @@ import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { productDetailSelector } from 'src/redux/selector';
 import ConfirmModal from 'src/general/components/Modal/ConfirmModal';
 import CustomeTopbar from 'src/general/components/Topbar/CustomeTopbar';
-import { uploadImage } from 'src/utils/upLoadImage';
+import useUploadImage from 'src/hook/upLoadImage';
 import AutoSlider from 'src/general/components/Slider';
 import { replaceImage } from 'src/utils/variable';
 import dayjs from 'dayjs';
@@ -24,16 +24,17 @@ import { ProductDetailColumn, ProductDetailSubColumn } from 'src/general/compone
 import OnceRow from 'src/general/components/Table/Product/OnceRow';
 import ColabRow from 'src/general/components/Table/Product/ColabRow';
 import SubTable from 'src/general/components/Table/ColabTable/SubTable';
+import { PATH_PRODUCT } from 'src/general/constants/path';
+import { updateProductEdit } from '../ProductCreating/productEditSlice';
 
 export default function ProductDetail() {
   const { id } = useParams();
   const location = useLocation();
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const { pageTitle, typeTitle, onTitleClick } = location.state;
-
+  const { pageTitle, typeTitle, onTitleClick } = location.state || {};
+  const [uploadImage, isPendingUploadImage] = useUploadImage();
   const [images, setimages] = React.useState<File[]>([]);
-  const [openAddAttribute, setOpenAddAttribute] = React.useState(false);
   const productDetail = useSelector(productDetailSelector);
   const [backupDetail, setBackupDetail] = React.useState<ProductType>({} as ProductType);
   const [newAttribute, setNewAttribute] = React.useState<ProductAttributeType>({} as ProductAttributeType);
@@ -48,9 +49,6 @@ export default function ProductDetail() {
     },
     [onTitleClick]
   );
-  const handleOpenAddAttributeModal = () => {
-    setOpenAddAttribute(true);
-  };
   const fetchData = async () => {
     try {
       const response = await axiosClient.get(`product/detail/${id}`);
@@ -65,23 +63,6 @@ export default function ProductDetail() {
   React.useEffect(() => {
     fetchData();
   }, []);
-  const handleUpdateProduct = async () => {
-    const listLinks = [] as string[];
-    for (const image of images || []) {
-      const link = await uploadImage(image);
-      if (link !== null) {
-        listLinks.push(link);
-      }
-    }
-    try {
-      const response = await axiosClient.put(`product/updating/${id}`, {
-        ...productDetail,
-      });
-      dispatch(updateProductDetail(response.data));
-    } catch (err) {
-      console.log(err);
-    }
-  };
   const handleDeleteAttribute = async () => {
     try {
       await axiosClient.put(`product-attributes/delete/${deleteItem}`);
@@ -91,67 +72,9 @@ export default function ProductDetail() {
       console.log(err);
     }
   };
-  const changeAttribute = (title: string, value: any) => {
-    setNewAttribute({
-      ...newAttribute,
-      [title]: value,
-    });
-  };
-  const handleAddAttribute = async () => {
-    let imageLink = '';
-    if (attributeImage !== null) {
-      const link = await uploadImage(attributeImage);
-      if (link !== null) {
-        imageLink = link;
-        setNewAttribute({
-          ...newAttribute,
-          imageLink: link,
-        });
-      }
-    }
-
-    try {
-      const response = await axiosClient.post(`product-attributes/creating`, {
-        ...newAttribute,
-        productId: id,
-        imageLink: imageLink,
-      });
-      dispatch(addAttribute(response.data));
-    } catch (e) {
-      console.log(e);
-    }
-  };
-  const handleUpdateAttribute = async () => {
-    if (attributeImage !== null) {
-      const link = await uploadImage(attributeImage);
-      if (link !== null) {
-        setNewAttribute({
-          ...newAttribute,
-          imageLink: link,
-        });
-      }
-    }
-    try {
-      const response = await axiosClient.put(`product-attributes/updating/${newAttribute.id}`, {
-        ...newAttribute,
-        productId: id,
-      });
-      console.log(response);
-    } catch (e) {
-      console.log(e);
-    }
-  };
-  const handleEditAttribute = (attribute: ProductAttributeType) => {
-    setNewAttribute(attribute);
-    setOpenAddAttribute(true);
-  };
   const handleCloseModal = () => {
     setDeleteItem(0);
     setShow('');
-  };
-  const handleCloseEdit = () => {
-    setEdit(false);
-    dispatch(updateProductDetail(backupDetail));
   };
   const listImage =
     productDetail.attributes && productDetail.imageLink && productDetail.imageLink !== ''
@@ -178,7 +101,7 @@ export default function ProductDetail() {
         const maxSellPrice = attribute.inventoryList?.reduce((max, inventory) => {
           return max < inventory.sellPrice ? (max = inventory.sellPrice) : max;
         }, 0);
-        const minSellPrice = attribute.inventoryList?.reduce((max , inventory) => {
+        const minSellPrice = attribute.inventoryList?.reduce((max, inventory) => {
           return max > inventory.sellPrice ? (max = inventory.sellPrice) : max;
         }, 100000000000000);
         // const sellPrice = attribute.inventoryList?.reduce((total, inventory) => total + inventory.sellPrice, 0);
@@ -186,7 +109,7 @@ export default function ProductDetail() {
           ...attribute,
           key: attribute.id,
           quantity: quantity,
-          inventory: attribute?.inventoryList.length === 1? attribute?.inventoryList[0].inventory.name : '',
+          inventory: attribute?.inventoryList.length === 1 ? attribute?.inventoryList[0].inventory.name : '',
           subTableRow: attribute.inventoryList,
           costPrice: maxCostPrice === minCostPrice ? maxCostPrice : `${minCostPrice} - ${maxCostPrice}`,
           sellPrice: maxSellPrice === minSellPrice ? maxSellPrice : `${minSellPrice} - ${maxSellPrice}`,
@@ -194,6 +117,16 @@ export default function ProductDetail() {
       }),
     [productDetail]
   );
+  const handleNavigateUpdateProduct = () => {
+    dispatch(updateProductEdit(productDetail));
+    navigate(PATH_PRODUCT.PRODUCT_CREATE_PATH, {
+      state: {
+        pageTitle: 'Quay về trang chi tiết sản phẩm',
+        typeTitle: 'navigate',
+        onTitleClick: PATH_PRODUCT.PRODUCT_DETAIL_PATH.replace('id', productDetail.id.toString()),
+      },
+    });
+  };
   return (
     <div>
       <BaseLayout
@@ -202,22 +135,13 @@ export default function ProductDetail() {
             pageTitle={pageTitle ? pageTitle : 'Chi tiết sản phẩm'}
             typeTitle={typeTitle ? typeTitle : 'text'}
             onTitleClick={() => handleBackPage(onTitleClick)}
-            buttonGroup={
-              !edit
-                ? [
-                    { buttonTitle: 'Xóa', onClick: () => {} },
-                    {
-                      buttonTitle: 'Sửa sản phẩm',
-                      onClick: () => {
-                        setEdit(true);
-                      },
-                    },
-                  ]
-                : [
-                    { buttonTitle: 'Hủy', onClick: handleCloseEdit, color: 'error' },
-                    { buttonTitle: 'Cập nhập sản phẩm', onClick: handleUpdateProduct },
-                  ]
-            }
+            buttonGroup={[
+              { buttonTitle: 'Xóa', onClick: () => {}, color: 'error' },
+              {
+                buttonTitle: 'Sửa sản phẩm',
+                onClick: handleNavigateUpdateProduct,
+              },
+            ]}
           />
         }
       >
@@ -247,8 +171,6 @@ export default function ProductDetail() {
                       sx={{ width: '100%' }}
                     />
                   </LocalizationProvider>
-                  {/* <TextField fullWidth value={getformatDate(productDetail?.createAt)} /> */}
-                  {/* <p>: {getformatDate(productDetail.createAt)}</p> */}
                 </Box>
               </Box>
               <Box>
@@ -265,9 +187,6 @@ export default function ProductDetail() {
           <Box className="product-content-attributes">
             <div className="product-content-heading">
               <h4 className="title">Thuộc tính sản phẩm</h4>
-              <Button onClick={handleOpenAddAttributeModal} startIcon={<AddIcon />}>
-                Thêm thuộc tính
-              </Button>
             </div>
             <Box className="attributes-table">
               <ColabTable

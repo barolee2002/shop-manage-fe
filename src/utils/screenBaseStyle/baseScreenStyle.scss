@@ -1,10 +1,11 @@
-@import "../../../utils/variable.scss";
+@import "../variable.scss";
 
-.product-list {
-  .fillter-box {
-    width: 20%;
+.list {
+  .fillter-box{
+    .MuiButton-contained{
+      padding: 0 48px;
+    }
   }
-
   .content {
     &-wrapper {
       background-color: #fff;
@@ -13,7 +14,8 @@
       &-search {
         display: flex;
         justify-content: space-between;
-        gap: 0 36px;
+        gap: 24px;
+        position: relative;
         width: 100%;
         .search-result {
           width: 100%;
@@ -96,7 +98,7 @@
     }
   }
   .filter-btn {
-    padding: 12px 24px;
+    padding: 12px 36px;
     width: 32%;
   }
 }

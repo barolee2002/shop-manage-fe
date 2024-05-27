@@ -1,22 +1,37 @@
-@import "./utils/variable.scss";
+@import './utils/variable.scss';
 
 .App {
   text-align: center;
 }
 .cost-price {
-  color : $cost-price;
+  color: $cost-price;
   font-weight: 500;
 }
 .sell-price {
-  color : $sell-price;
+  color: $sell-price;
   font-weight: 500;
+}
+.susscess-status {
+  padding: 6px 12px;
+  border: 1px solid $success-color;
+  border-radius: 16px;
+  text-align: center;
+}
+.error-color {
+  padding: 6px 12px;
+  border: 1px solid $error-color;
+  border-radius: 16px;
+  text-align: center;
 }
 .App-logo {
   height: 40vmin;
   pointer-events: none;
 }
-.MuiTableCell-root{
+.MuiTableCell-root {
   font-size: 14px !important;
+}
+.m-auto {
+  margin: auto;
 }
 @media (prefers-reduced-motion: no-preference) {
   .App-logo {
@@ -44,13 +59,13 @@
   align-items: center;
   justify-content: space-between;
   // gap: 0 550px;
-  .action{
-      display: flex;
-      &-btn{
-          font-size: 14px;
-          padding: 8px 12px;
-          margin: 0 8px;
-      }
+  .action {
+    display: flex;
+    &-btn {
+      font-size: 14px;
+      padding: 8px 12px;
+      margin: 0 8px;
+    }
   }
 }
 .App-link {
@@ -62,17 +77,43 @@
 //   gap : 0 12px;
 //   padding: 0 !important;
 // }
-.w-100{
+.w-100 {
   width: 100%;
 }
-.h-100{
+.w70 {
+  width: 70%;
+  text-align: start;
+}
+.relative-block {
+  position: relative;
+  min-width: 50px;
+  & > div {
+    width: 100%;
+  }
+}
+.important-text {
+  font-weight: 500;
+  offset: 4px;
+  &:hover {
+    border-bottom: 1px solid #ccc;
+  }
+}
+.h-100 {
   height: 100%;
 }
-.bd-radius-6{
+.mb16{
+  margin-bottom: 16px;
+}
+.header-title2{
+  font-size: 16px;
+  font-weight: 500;
+  text-align: start;
+}
+.bd-radius-6 {
   border-radius: 6px !important;
 }
-.quantity-danger{
-  color : #e70202;
+.quantity-danger {
+  color: #e70202;
 }
 .sub-header {
   display: flex;
@@ -80,14 +121,13 @@
   border-bottom: 1px solid #ddd;
   margin-bottom: 16px;
   padding: 8px 0;
-  &-title{
+  &-title {
     font-weight: 500;
     font-size: 16px;
     margin: 0;
     vertical-align: middle;
     padding: 0;
     text-align: center;
-    
   }
 }
 .modal-wrapper {
@@ -99,10 +139,8 @@
     .title {
       font-weight: 500;
       // margin-bottom: 12px;
-      text-align:end;
+      text-align: end;
       font-size: 16px;
-      
-      
     }
     .close-btn {
       font-size: 28px;
@@ -147,7 +185,7 @@
       }
     }
   }
-  &-save-btn{
+  &-save-btn {
     padding: 8px 24px;
   }
 }
@@ -156,13 +194,13 @@
 }
 .MuiBox-root.css-b8tju9 {
   border-radius: 6px;
-  border : 1px solid #ddd;
+  border: 1px solid #ddd;
 }
 .row {
   display: flex;
   flex-direction: row;
 }
-.image-product{
+.image-product {
   width: 50px;
   height: 50px;
   object-fit: cover;
@@ -172,10 +210,16 @@
   display: flex;
   gap: 0 25px;
 }
+.title-2 {
+  font-size: 18px;
+  white-space: nowrap;
+  // margin: auto;
+  font-weight: 500;
+}
 .MuiButton-root {
   font-size: 14px !important;
 }
-.MuiTab-root{
+.MuiTab-root {
   font-size: 14px !important;
 }
 @keyframes App-logo-spin {

@@ -23,6 +23,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 
 import { AppConstants } from '../../constants/AppConstants';
 import { Collapse } from '@mui/material';
+import { PATH_INVENTORY_TAKE_CARE, PATH_PRODUCT, PATH_RECEIPT_PRODUCT } from 'src/general/constants/path';
 
 const openedMixin = (theme: Theme): CSSObject => ({
   width: AppConstants.sidebarWidth,
@@ -97,7 +98,7 @@ export default function Sidebar() {
         type: 'item',
         text: 'Tổng quan',
         icon: <HomeOutlinedIcon sx={{ fontSize: '2rem' }} />,
-        path: '/admin/dashboard',
+        path: '/main/dashboard',
       },
       {
         type: 'item',
@@ -124,7 +125,7 @@ export default function Sidebar() {
           {
             type: 'item',
             text: 'Danh sách sản phẩm',
-            path: '/admin/products',
+            path: PATH_PRODUCT.PRODUCT_LIST_PATH,
           },
           {
             type: 'item',
@@ -133,8 +134,18 @@ export default function Sidebar() {
           },
           {
             type: 'item',
+            text: 'Đặt hàng',
+            path: PATH_RECEIPT_PRODUCT.RECEIPT_PRODUCT_LIST_PATH,
+          },
+          {
+            type: 'item',
             text: 'Nhập kho',
-            path: 'admin/purchase_order',
+            path: PATH_RECEIPT_PRODUCT.INVENTORY_IN,
+          },
+          {
+            type: 'item',
+            text: 'Kiểm kê',
+            path: PATH_INVENTORY_TAKE_CARE.INVENTORY_TAKE_CARE_LIST_PATH,
           },
         ],
       },

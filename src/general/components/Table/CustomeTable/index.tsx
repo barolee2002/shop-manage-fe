@@ -1,31 +1,14 @@
 import React from 'react';
 import { metaData } from 'src/types/MetaData';
+import { TableProps } from 'src/types/TableType';
 import { Pagination, PaginationItem, Table, TableBody, TableCell, TableHead, TableRow } from '@mui/material';
 import { ArrowBack as ArrowBackIcon, ArrowForward as ArrowForwardIcon } from '@mui/icons-material';
 
 import '../style.scss';
+import Loading from '../../Loading';
 
-interface Column {
-  field: string;
-  headerName: string | undefined;
-  headerClassName: string | undefined;
-  renderCell?: (item: any) => JSX.Element | null | undefined;
-  [key: string]: any;
-}
-interface Row {
-  key: any;
-  [key: string]: any;
-}
-interface Props {
-  columns: Column[];
-  rows: Row[];
-  metadata: metaData;
-  onChangePage: (event: React.ChangeEvent<unknown>, value: number) => void;
-  onRowClick: (item: any) => void;
-  className: string;
-}
-
-export default function CustomTable(props: Partial<Props>) {
+export default function CustomTable(props: TableProps) {
+  const { pagination = false, loading = false } = props;
   console.log(props.metadata);
   // React.useEffect(() => {
   //   props.
@@ -40,9 +23,10 @@ export default function CustomTable(props: Partial<Props>) {
                 {column.headerName}
               </TableCell>
             ))}
-          </TableRow>{' '}
+          </TableRow>
         </TableHead>
-        <TableBody>
+        <TableBody className={loading ? 'mh300' : ''}>
+          {loading && <Loading isLoading={loading} size={50} />}
           {props.rows?.map((row) => (
             <TableRow
               key={row.id}
@@ -51,22 +35,24 @@ export default function CustomTable(props: Partial<Props>) {
             >
               {props.columns?.map((column) => (
                 <TableCell key={column.field}>
-                  {column.renderCell ? column.renderCell({ value: row[column.field] }) : row[column.field]}
+                  {column.renderCell ? column.renderCell(row) : row[column.field]}
                 </TableCell>
               ))}
             </TableRow>
           ))}
         </TableBody>
       </Table>
-      <div className="cutome-table-pagination">
-        <Pagination
-          count={props.metadata?.totalPages}
-          renderItem={(item) => (
-            <PaginationItem slots={{ previous: ArrowBackIcon, next: ArrowForwardIcon }} {...item} />
-          )}
-          onChange={props.onChangePage}
-        />
-      </div>
+      {pagination && (
+        <div className="cutome-table-pagination">
+          <Pagination
+            count={props.metadata?.totalPages}
+            renderItem={(item) => (
+              <PaginationItem slots={{ previous: ArrowBackIcon, next: ArrowForwardIcon }} {...item} />
+            )}
+            onChange={props.onChangePage}
+          />
+        </div>
+      )}
     </React.Fragment>
   );
 }
