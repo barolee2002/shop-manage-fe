@@ -1,22 +1,26 @@
-import React from 'react';
+import { useState } from 'react';
 import axiosClient from 'src/api/axiosClient';
 import { ENDPOINTS_RECEIPT } from 'src/general/constants/endpoints';
+import { FilterReceipt, ReceiptsList } from 'src/types/ReceiptType';
 
-const useDeleteReceipt = (id: number): [() => Promise<number>, boolean] => {
-  const [isPendingDeleteReceipt, setIsPendingDeleteReceipt] = React.useState(false);
-  const fetchApi = async (): Promise<number> => {
-    setIsPendingDeleteReceipt(true);
+const useGetReceiptProductList = (): [(data: FilterReceipt) => Promise<ReceiptsList>, boolean] => {
+  const [isPendingGetReceiptProductList, setIsPendingGetReceiptProductList] = useState<boolean>(false);
+  const fetchApi = async (data: FilterReceipt): Promise<ReceiptsList> => {
+    setIsPendingGetReceiptProductList(true);
     try {
-      const res = await axiosClient.delete(ENDPOINTS_RECEIPT.DELETE.replace(':id', String(id)));
-      setIsPendingDeleteReceipt(false);
-      return res.data;
+      const response = await axiosClient.get<ReceiptsList>(ENDPOINTS_RECEIPT.GET_RECEIPT_LIST_ENDPOINT, {
+        params: {
+          ...data,
+        },
+      });
+      setIsPendingGetReceiptProductList(false);
+      return response.data;
     } catch (err) {
       console.log(err);
-      setIsPendingDeleteReceipt(false);
       throw err;
     }
   };
-  return [fetchApi, isPendingDeleteReceipt];
+  return [fetchApi, isPendingGetReceiptProductList];
 };
 
-export default useDeleteReceipt;
+export default useGetReceiptProductList;

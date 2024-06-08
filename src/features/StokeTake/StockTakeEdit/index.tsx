@@ -1,6 +1,6 @@
-import { Box, Grid, IconButton, InputAdornment, TextField } from '@mui/material';
+import { Box, Divider, Grid, IconButton, InputAdornment, TextField } from '@mui/material';
 import dayjs from 'dayjs';
-import { memo, useCallback, useEffect, useRef, useState } from 'react';
+import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { useDispatch } from 'react-redux';
 import { useLocation, useNavigate } from 'react-router';
@@ -8,18 +8,17 @@ import { BaseLayout } from 'src/general/components/BaseLayout';
 import CustomeTopbar from 'src/general/components/Topbar/CustomeTopbar';
 import useGetProductList from 'src/hook/product/useGetProductsList';
 import useCreateActionHistory from 'src/hook/useCreateActionHistory';
-import useGetInventory from 'src/hook/useGetInventory';
 import useGetUsers from 'src/hook/user/useGetStaff';
-import { stockTakeEditSelector } from 'src/redux/selector';
+import { inventorySelector, stockTakeEditSelector, userModelSelector } from 'src/redux/selector';
 import { FilterProductType, ProductAttributeType, ProductList } from 'src/types/Product';
-import { testuser } from 'src/utils/test';
 import {
   addProductStockTakeEdit,
   changeStockTakeProductEdit,
   changeValueEditStockTake,
+  deleteProductStockTake,
   updateStockTakeEdit,
 } from './stockTakeSlice';
-import { Add as AddIcon, Delete as DeleteIcon } from '@mui/icons-material';
+import { Add as AddIcon, Delete as DeleteIcon, Details } from '@mui/icons-material';
 import { useDebounce } from 'src/hook/useDebounce';
 import { initialStockTake, initialStockTakeDetail } from 'src/utils/initialValue';
 import useCreateStockTake from 'src/hook/stockTake/useCreateStockTake';
@@ -33,21 +32,23 @@ import './StockTakeEdit.style.scss';
 import SearchProductDropdown from 'src/general/components/SearchProductDropdown';
 import { getFlatAttribute } from 'src/utils/getFlatAttribute';
 import { NumericFormat } from 'react-number-format';
+import { UserType } from 'src/types/user.type';
 
 const StockTakeEdit = () => {
   const location = useLocation();
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const current = dayjs();
+  const userModel = useSelector(userModelSelector);
   const stockTake = useSelector(stockTakeEditSelector);
-  const { pageTitle, typeTitle, onTitleClick, typeFeature } = location.state;
+  const { pageTitle, typeTitle, onTitleClick, typeFeature } = location.state ?? {};
   const [searchString, setSearchString] = useState<string>('');
   const [searchResult, setSearchResult] = useState<ProductList>({} as ProductList);
   const searchValue = useDebounce(searchString);
   const [createStockTake, isPendingCreateStockTake] = useCreateStockTake();
   const [updateStockTake, isPendingUpdateStockTake] = useUpdateStockTake();
-  const [inventories, isPendingGetInventory] = useGetInventory(testuser.storeId);
-  const [staffs] = useGetUsers(testuser.storeId);
+  const inventories = useSelector(inventorySelector);
+  const { staffs } = useGetUsers(userModel.storeId);
   const [createActionHistory] = useCreateActionHistory();
   const render = useRef(true);
   const [getProductList] = useGetProductList();
@@ -56,7 +57,7 @@ const StockTakeEdit = () => {
   }, [onTitleClick]);
   useEffect(() => {
     if (Object.keys(stockTake).length === 0 && stockTake.constructor === Object) {
-      dispatch(updateStockTakeEdit({ ...initialStockTake, storeId: testuser.id }));
+      dispatch(updateStockTakeEdit({ ...initialStockTake, storeId: userModel.id }));
     }
   }, [stockTake]);
   useEffect(() => {
@@ -70,15 +71,16 @@ const StockTakeEdit = () => {
   });
   const handleSearchProduct = () => {
     getProductList({
-      storeId: testuser.storeId,
+      storeId: userModel.storeId,
       searchString: searchValue,
+      inventoryId: stockTake?.inventory?.id,
     } as FilterProductType).then((res) => {
       setSearchResult(res);
     });
   };
   const handleChangeStaff = (id: number) => {
     const selectStaff = staffs.find((staff) => staff.id === id);
-    dispatch(changeValueEditStockTake({ bookingUser: selectStaff }));
+    dispatch(changeValueEditStockTake({ create: selectStaff }));
   };
   const handleChangeInventory = (id: number) => {
     const selectInventory = inventories.find((inventory) => inventory.id === id);
@@ -91,8 +93,18 @@ const StockTakeEdit = () => {
       dispatch(addProductStockTakeEdit({ ...initialStockTakeDetail, productAttribute: attribute }));
     }
   };
+  const dataPost = useMemo(() => {
+    return {
+      ...stockTake,
+      storeId: userModel?.storeId,
+      details: stockTake?.details
+        ?.filter((detail) => detail?.productAttribute?.id !== 0)
+        ?.map((detail) => ({ ...detail, oldQuantity: detail?.productAttribute?.quantity })),
+      create: staffs.find(staff => staff?.id === userModel?.id) as UserType,
+    };
+  }, [stockTake]);
   const handleCreateStockTake = () => {
-    createStockTake(stockTake)
+    createStockTake(dataPost)
       .then((res) => {
         dispatch(openAlert({ message: 'Tạo đơn phiếu kiểm kho thành công', type: 'success' }));
         navigate(PATH_INVENTORY_TAKE_CARE.INVENTORY_TAKE_CARE_DETAIL_PATH.replace(':id', String(res.id)));
@@ -102,7 +114,7 @@ const StockTakeEdit = () => {
       });
   };
   const handleUpdateStockTake = () => {
-    updateStockTake(stockTake)
+    updateStockTake(dataPost)
       .then((res) => {
         dispatch(openAlert({ message: 'Cập nhập đơn phiếu kiểm kho thành công', type: 'success' }));
         navigate(PATH_INVENTORY_TAKE_CARE.INVENTORY_TAKE_CARE_DETAIL_PATH.replace(':id', String(res.id)));
@@ -120,6 +132,9 @@ const StockTakeEdit = () => {
         },
       })
     );
+  };
+  const handleDeleteProductStockTake = (id: number) => {
+    dispatch(deleteProductStockTake(id));
   };
   return (
     <BaseLayout
@@ -169,7 +184,7 @@ const StockTakeEdit = () => {
           <SelectField
             title="Nhân viên tạo"
             disable={true}
-            value={stockTake?.createUser?.id}
+            value={userModel.id}
             options={staffs.map((staff) => ({ value: staff.id, name: staff?.name }))}
             onChange={(value: number) => handleChangeStaff(value)}
             //   initialValue={initialSupplier}
@@ -190,49 +205,72 @@ const StockTakeEdit = () => {
             {stockTake?.details?.map((detail, index) => (
               <>
                 {detail?.productAttribute?.id !== 0 && (
-                  <Grid container gap={2} key={index} width={'100%'}>
-                    <TextField disabled value={getFlatAttribute(detail.productAttribute)} />
-                    <NumericFormat
-                      thousandSeparator=","
-                      customInput={TextField}
-                      value={detail.oldQuantity === 0 ? null : detail.oldQuantity}
-                      label="Số lượng trên hệ thống"
-                      InputProps={{
-                        endAdornment: (
-                          <InputAdornment position="end">
-                            <p>Sản phẩm</p>
-                          </InputAdornment>
-                        ),
-                      }}
-                      onChange={(e) =>
-                        handleChangeStokTakeDetail(index, 'oldQuantity', parseInt(e.target.value.replace(/,/g, '')))
-                      }
-                    />
-                    <NumericFormat
-                      thousandSeparator=","
-                      customInput={TextField}
-                      value={detail.actualQuantity === 0 ? null : detail.actualQuantity}
-                      label="Số lượng thực tế"
-                      InputProps={{
-                        endAdornment: (
-                          <InputAdornment position="end">
-                            <p>Sản phẩm</p>
-                          </InputAdornment>
-                        ),
-                      }}
-                      onChange={(e) =>
-                        handleChangeStokTakeDetail(index, 'actualQuantity', parseInt(e.target.value.replace(/,/g, '')))
-                      }
-                    />
-                    <TextField
-                      value={detail?.reason}
-                      placeholder='Lý do thay đổi'
-                      onChange={(e) => handleChangeStokTakeDetail(index, 'reason', e.target.value)}
-                    />
-                    <IconButton size="large">
-                      <DeleteIcon />
-                    </IconButton>
-                  </Grid>
+                  <>
+                    <Grid container gap={2} key={index} width={'100%'}>
+                      <Grid xs={12} lg={2.5}>
+                        <TextField fullWidth disabled value={getFlatAttribute(detail.productAttribute)} />
+                      </Grid>
+                      <Grid xs={12} lg={2.5}>
+                        <NumericFormat
+                          fullWidth
+                          thousandSeparator=","
+                          customInput={TextField}
+                          value={detail.oldQuantity === 0 ? detail.productAttribute.quantity : detail.oldQuantity}
+                          label="Số lượng trên hệ thống"
+                          InputProps={{
+                            endAdornment: (
+                              <InputAdornment position="end">
+                                <p>Sản phẩm</p>
+                              </InputAdornment>
+                            ),
+                          }}
+                          onChange={(e) =>
+                            handleChangeStokTakeDetail(index, 'oldQuantity', parseInt(e.target.value.replace(/,/g, '')))
+                          }
+                        />
+                      </Grid>
+                      <Grid xs={12} lg={2.5}>
+                        <NumericFormat
+                          fullWidth
+                          thousandSeparator=","
+                          customInput={TextField}
+                          value={detail.actualQuantity === 0 ? null : detail.actualQuantity}
+                          label="Số lượng thực tế"
+                          InputProps={{
+                            endAdornment: (
+                              <InputAdornment position="end">
+                                <p>Sản phẩm</p>
+                              </InputAdornment>
+                            ),
+                          }}
+                          onChange={(e) =>
+                            handleChangeStokTakeDetail(
+                              index,
+                              'actualQuantity',
+                              parseInt(e.target.value.replace(/,/g, ''))
+                            )
+                          }
+                        />
+                      </Grid>
+                      <Grid xs={12} lg={2.5}>
+                        <TextField
+                          fullWidth
+                          value={detail?.reason}
+                          placeholder="Lý do thay đổi"
+                          onChange={(e) => handleChangeStokTakeDetail(index, 'reason', e.target.value)}
+                        />
+                      </Grid>
+                      <Grid xs={12} lg={1}>
+                        <IconButton
+                          size="large"
+                          onClick={() => handleDeleteProductStockTake(detail?.productAttribute?.id)}
+                        >
+                          <DeleteIcon />
+                        </IconButton>
+                      </Grid>
+                    </Grid>
+                    <Divider variant="middle" component="a" />
+                  </>
                 )}
               </>
             ))}

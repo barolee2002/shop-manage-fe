@@ -3,10 +3,8 @@ import { Add as AddIcon, Close as CloseIcon } from '@mui/icons-material';
 import { Autocomplete, Box, Button, IconButton, Modal, TextField } from '@mui/material';
 import { ProductType } from 'src/types/Product';
 import './style.scss';
-import axiosClient from 'src/api/axiosClient';
 import { style } from 'src/utils/CustomStyle/StyleModal';
 import BaseDropzone from '../../DropZone';
-import { uploadImage } from 'src/hook/upLoadImage';
 
 interface Props {
   detail: ProductType;

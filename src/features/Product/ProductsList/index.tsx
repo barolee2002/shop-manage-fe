@@ -6,7 +6,7 @@ import { useSelector } from 'react-redux';
 import axiosClient from 'src/api/axiosClient';
 import { BaseLayout } from 'src/general/components/BaseLayout';
 import { Box, InputLabel, FormControl, MenuItem, TextField, IconButton, Snackbar, Alert } from '@mui/material';
-import { productSelector } from 'src/redux/selector';
+import { inventorySelector, productSelector, userModelSelector } from 'src/redux/selector';
 import InputAdornment from '@mui/material/InputAdornment';
 import { Search as SearchIcon, ModeEdit as ModeEditIcon } from '@mui/icons-material';
 import { changeProduct, updateProduct } from './ProductSlice';
@@ -29,36 +29,33 @@ import Filter from 'src/general/components/Filter';
 import DateTimeField from 'src/general/components/Filter/DateTimefield';
 import SelectField from 'src/general/components/Filter/SelectField';
 import Select from '@mui/material/Select';
-import { testuser } from 'src/utils/test';
-import useGetInventory from 'src/hook/useGetInventory';
 import useGetCategory from 'src/hook/useGetCategory';
 import { PATH_PRODUCT } from 'src/general/constants/path';
 import { updateProductEdit } from '../ProductCreating/productEditSlice';
-import Loading from 'src/general/components/Loading';
 import 'src/utils/screenBaseStyle/baseScreenStyle.scss';
 import { openAlert } from 'src/general/components/BaseLayout/alertSlice';
-
 
 export default function Product() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const userModel = useSelector(userModelSelector);
   const products = useSelector(productSelector);
-  const [categories] = useGetCategory(testuser.storeId);
+  const [categories] = useGetCategory(userModel.storeId);
   const [category, setCategory] = useState('');
   const [metadata, setMetadata] = useState<metaData>({} as metaData);
-  const [inventory, setInventory] = useState(testuser.storeId);
   const [searchString, setSearchString] = useState('');
   const [show, setShow] = useState('');
   const [loading, setLoading] = useState<boolean>(false);
   const [uploadImage] = useUploadImage();
   const [editAttribute, setEditAttribute] = useState<ProductAttributeType>({} as ProductAttributeType);
   const [image, setImage] = useState<File | null>(null);
-  const [inventories, isPendingGetInventory] = useGetInventory(testuser.storeId);
+  const inventories = useSelector(inventorySelector);
   const [editProduct, setEditProduct] = useState<ProductType>({} as ProductType);
   const debounceString = useDebounce(searchString, 500);
   const [fromTime, setFromTime] = useState<Dayjs | null>(null);
   const [toTime, setToTime] = useState<Dayjs | null>(null);
   const [page, setPage] = useState(1);
+  const [inventory, setInventory] = useState(inventories[0]?.id);
   const handleCloseMOdal = () => {
     setShow('');
     setEditProduct({} as ProductType);
@@ -109,7 +106,7 @@ export default function Product() {
       // const fromDate =
       const response = await axiosClient.get(`product/all`, {
         params: {
-          storeId: testuser.storeId,
+          storeId: userModel.storeId,
           searchString: searchString,
           category: category,
           page: page,
@@ -180,7 +177,6 @@ export default function Product() {
     setFromTime(fromTime);
     setToTime(toTime);
   }, []);
-  console.log(fromTime, toTime);
 
   const handleAddProduct = () => {
     dispatch(updateProductEdit({} as ProductType));
@@ -224,26 +220,23 @@ export default function Product() {
                 />
               </div>
               <div className="relative-block">
-                {isPendingGetInventory ? (
-                  <Loading isLoading={isPendingGetInventory} />
-                ) : (
-                  <FormControl>
-                    <InputLabel id="select-inventory">Kho</InputLabel>
-                    <Select
-                      label="Kho"
-                      size="small"
-                      labelId="select-inventory"
-                      value={inventory}
-                      onChange={(e) => setInventory(e.target.value as number)}
-                    >
-                      {inventories?.map((inventory) => (
+                <FormControl>
+                  <InputLabel id="select-inventory">Kho</InputLabel>
+                  <Select
+                    label="Kho"
+                    size="small"
+                    labelId="select-inventory"
+                    value={inventory}
+                    onChange={(e) => setInventory(e.target.value as number)}
+                  >
+                    {inventories &&
+                      inventories?.map((inventory) => (
                         <MenuItem key={inventory.id} value={inventory?.id}>
                           {inventory.name}
                         </MenuItem>
                       ))}
-                    </Select>
-                  </FormControl>
-                )}
+                  </Select>
+                </FormControl>
               </div>
               <Filter onFilter={handleFilter}>
                 <React.Fragment>

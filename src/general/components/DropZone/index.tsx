@@ -23,7 +23,7 @@ function BaseDropzone(props: Props) {
   const [images, setImages] = useState<any>([]);
   const [image, setImage] = useState<File | null | string>(null);
   const [isDrapping, setIsDrapping] = useState(false);
-  console.log(parentImage, imageKey);
+  // console.log(image);
   const didMountRef = useRef(false);
   const fileInputRef = useRef<any>(null);
 
@@ -99,12 +99,12 @@ function BaseDropzone(props: Props) {
                 <img
                   role="presentation"
                   src={
-                    // typeof image !== 'string' && image
-                    //   ? URL.createObjectURL(image)
-                    //   : typeof image === 'string' && parentImage && image && image !== ''
-                    //   ? image
-                    //   : ''
-                    parentImage ? parentImage : ''
+                    typeof image !== 'string' && image
+                      ? URL.createObjectURL(image)
+                      : typeof image === 'string' && parentImage && image && image !== ''
+                      ? image
+                      : ''
+                    // parentImage ? parentImage : ''
                   }
                   alt={props.typeImage}
                   onClick={selectFiles}

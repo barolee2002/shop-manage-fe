@@ -1,0 +1,14 @@
+.signin {
+  background-image: url('src/assets/images/login.jpeg');
+  background-repeat: no-repeat;
+  background-position: 0ch;
+  background-size: cover;
+  &-container {
+    background-color: #fff;
+    padding: 48px;
+    border-radius: 6px;
+    &-wrapper {
+      max-width: 600px;
+    }
+  }
+}

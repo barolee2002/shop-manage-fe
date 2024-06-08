@@ -1,0 +1,36 @@
+.staff-edit {
+    display: flex;
+    justify-content: center;
+  .info {
+    background-color: #fff;
+    padding: 12px;
+    border-radius: 6px;
+    // margin: 0 100px;
+    width: auto;
+    .base-info {
+    }
+
+    .fillter-box-wrapper {
+      padding: 16px;
+      display: block;
+      &-item {
+        display: flex;
+        gap: 12px;
+        width: 100%;
+        margin-bottom: 24px;
+        .filter-title {
+          color: #000 !important;
+          text-align: center;
+          // width : 30%;
+        }
+      }
+      .filter-btn {
+        padding: 12px 36px;
+        width: 32%;
+      }
+    }
+    .fillter-box-wrapper-item{
+      margin-bottom: 0;
+    }
+  }
+}

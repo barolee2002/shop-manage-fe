@@ -30,7 +30,6 @@ const ReceiptProductDetail = () => {
   const [inventoryInReceipt, isPendingInventoryInReceipt] = useInventoryInReceipt(id ? Number(id) : 0);
   const [deleteReceipt, isPendingDeleteReceipt] = useDeleteReceipt(id ? Number(id) : 0);
   const [receiptDetail, isPendingGetReceiptDetail, getReceiptDetail] = useGetReceiptProduct(id ?? '0');
-  // const [receiptDetail, setReceiptDetail] = useState<ReceiptsType>({} as ReceiptsType);
   const handleBackPage = useCallback(
     (link: string) => {
       navigate(`${link}`);

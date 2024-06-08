@@ -45,7 +45,6 @@ function ScrollTop(props: Props) {
 export const BaseLayout = (props: Props) => {
   const dispatch = useDispatch();
   const alert = useSelector(alertSelector);
-console.log(alert);
 
   const handleCloseAlert = (event: React.SyntheticEvent | Event, reason?: string) => {
     if (reason === 'clickaway') {
@@ -62,12 +61,12 @@ console.log(alert);
           {props.children}
           <Snackbar
             anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
-            open={alert.open}
+            open={alert?.open}
             autoHideDuration={2000}
             onClose={handleCloseAlert}
           >
-            <Alert onClose={handleCloseAlert} severity={alert.type} variant="filled" sx={{ width: '100%' }}>
-              {alert.message}
+            <Alert onClose={handleCloseAlert} severity={alert?.type} variant="filled" sx={{ width: '100%' }}>
+              {alert?.message}
             </Alert>
           </Snackbar>
         </Container>

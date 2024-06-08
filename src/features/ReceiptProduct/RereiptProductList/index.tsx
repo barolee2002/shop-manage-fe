@@ -8,18 +8,15 @@ import { BaseLayout } from 'src/general/components/BaseLayout';
 import CustomeTopbar from 'src/general/components/Topbar/CustomeTopbar';
 import useGetReceiptProductList from 'src/hook/receiptProduct/useGetReceiptProductList';
 import { FilterReceipt, ReceiptsType } from 'src/types/ReceiptType';
-import { testuser } from 'src/utils/test';
 import { metaData } from 'src/types/MetaData';
-import Loading from 'src/general/components/Loading';
-import useGetInventory from 'src/hook/useGetInventory';
 import { useDebounce } from 'src/hook/useDebounce';
 import Filter from 'src/general/components/Filter';
 import DateTimefield from 'src/general/components/Filter/DateTimefield';
 import SelectField from 'src/general/components/Filter/SelectField';
-import dayjs, { Dayjs } from 'dayjs';
+import { Dayjs } from 'dayjs';
 import useGetUsers from 'src/hook/user/useGetStaff';
 import useGetSuppliers from 'src/hook/supplier/useGetSuppliers';
-import { payStatusOptions, receiptOptions } from 'src/general/constants/utils.constants';
+import { payStatusOptions } from 'src/general/constants/utils.constants';
 import NumberRangeField from 'src/general/components/Filter/NumberRangeField';
 import { getDayjsFormatDate } from 'src/utils/formatDate';
 import 'src/utils/screenBaseStyle/baseScreenStyle.scss';
@@ -30,20 +27,23 @@ import { PATH_RECEIPT_PRODUCT } from 'src/general/constants/path';
 import { useDispatch } from 'react-redux';
 import { updateReceiptEdit } from '../ReceiptProductCreating/receiptSlice';
 import useCreateActionHistory from 'src/hook/useCreateActionHistory';
+import { inventorySelector, userModelSelector } from 'src/redux/selector';
+import { useSelector } from 'react-redux';
 
 const ReceiptProductList = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
+  const userModel = useSelector(userModelSelector);
+  const inventories = useSelector(inventorySelector);
   const [getReceiptList, isPendingGetReceiptProductList] = useGetReceiptProductList();
-  const [inventories, isPendingGetInventory] = useGetInventory(testuser.storeId);
-  const [staffs] = useGetUsers(testuser.storeId);
+  const { staffs } = useGetUsers(userModel.storeId);
   const [createActionHistory] = useCreateActionHistory();
-  const [suppliers] = useGetSuppliers(testuser.storeId);
+  const [suppliers] = useGetSuppliers(userModel.storeId);
   const [searchString, setSearchString] = useState<string>('');
   const searchValue = useDebounce(searchString);
   const [filterForm, setFilterForm] = useState<FilterReceipt>({
-    storeId: testuser.storeId,
-    inventoryId: testuser.storeId,
+    storeId: userModel.storeId,
+    inventoryId: inventories[0]?.id,
     searchString: searchValue,
   } as FilterReceipt);
   const [metadata, setMetadata] = useState<metaData>({} as metaData);
@@ -109,10 +109,10 @@ const ReceiptProductList = () => {
       >
         <Box className="content">
           <Box className="content-wrapper">
-            <Grid container wrap='wrap' gap={4} className="content-wrapper-search">
+            <Grid container wrap="wrap" gap={4} className="content-wrapper-search">
               <Grid container gap={4} xs={12} lg={7}>
                 <p className="title-2">Phiếu nhập kho</p>
-                <Grid lg={9}>
+                <Grid item lg={9}>
                   <TextField
                     size="small"
                     fullWidth
@@ -132,26 +132,22 @@ const ReceiptProductList = () => {
               </Grid>
               <Grid container xs={12} gap={4} lg={3.6} justifyContent={'flex-end'}>
                 <div className="relative-block">
-                  {isPendingGetInventory ? (
-                    <Loading isLoading={isPendingGetInventory} />
-                  ) : (
-                    <FormControl>
-                      <InputLabel id="select-inventory">Kho</InputLabel>
-                      <Select
-                        label="Kho"
-                        size="small"
-                        labelId="select-inventory"
-                        value={filterForm.inventoryId}
-                        onChange={(e) => handleChangeFilterForm('inventoryId', e.target.value as number)}
-                      >
-                        {inventories?.map((inventory) => (
-                          <MenuItem key={inventory.id} value={inventory?.id}>
-                            {inventory.name}
-                          </MenuItem>
-                        ))}
-                      </Select>
-                    </FormControl>
-                  )}
+                  <FormControl>
+                    <InputLabel id="select-inventory">Kho</InputLabel>
+                    <Select
+                      label="Kho"
+                      size="small"
+                      labelId="select-inventory"
+                      value={filterForm.inventoryId}
+                      onChange={(e) => handleChangeFilterForm('inventoryId', e.target.value as number)}
+                    >
+                      {inventories?.map((inventory) => (
+                        <MenuItem key={inventory.id} value={inventory?.id}>
+                          {inventory.name}
+                        </MenuItem>
+                      ))}
+                    </Select>
+                  </FormControl>
                 </div>
                 <Filter onFilter={handleFilter}>
                   <React.Fragment>

@@ -1,0 +1,77 @@
+.selling-wrapper {
+  height: 100%;
+  &-header {
+    padding: 12px;
+    position: fixed;
+    top: 0;
+    z-index: 100;
+    background-color: #05457d;
+    &-item {
+      background-color: #fff;
+      padding: 6px;
+      border-radius: 6px;
+    }
+  }
+  &-content {
+    padding-top: 72px;
+    height: 100%;
+    &-item {
+      border-left: 1px solid #ddd;
+      padding: 12px;
+      justify-content: center !important;
+      padding-top: 24px;
+      height: 630px;
+      // position: relative;
+      height: 100%;
+      overflow-y: scroll;
+      &-product {
+        margin: 12px 0;
+        &-colapse {
+          margin: 12px 0;
+          padding: 0 36px;
+        }
+      }
+      .quantity {
+        padding: 0 14px;
+        border: 1px solid #000;
+        border-radius: 4px;
+      }
+      .product-quantity {
+        .MuiTextField-root {
+          width: 100%;
+          & .MuiInputBase-root {
+            width: 100%;
+          }
+        }
+      }
+      .bill {
+        &-title {
+          margin-top: 12px;
+        }
+      }
+      &-pagination {
+        position: absolute;
+        bottom: 0;
+        z-index: 100;
+        align-self: flex-end;
+        left: 0;
+        background-color: #ddd;
+        // padding: 12px;
+        width: 100%;
+        border-top: 1px solid #ddd;
+      }
+      &-pay-btn {
+        position: relative;
+        // bottom: 50px;
+        z-index: 100;
+        align-self: flex-end;
+        left: 0;
+        padding: 12px;
+        width: 100%;
+      }
+    }
+  }
+  .blur-box {
+    opacity: 0.6;
+  }
+}

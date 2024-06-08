@@ -19,11 +19,17 @@ import {
 } from '@mui/icons-material';
 import './style.scss';
 
-import { useLocation, useNavigate } from 'react-router-dom';
+import { Link, Navigate, useLocation, useNavigate } from 'react-router-dom';
 
 import { AppConstants } from '../../constants/AppConstants';
 import { Collapse } from '@mui/material';
-import { PATH_INVENTORY_TAKE_CARE, PATH_PRODUCT, PATH_RECEIPT_PRODUCT } from 'src/general/constants/path';
+import {
+  PATH_INVENTORY_TAKE_CARE,
+  PATH_PRODUCT,
+  PATH_RECEIPT_PRODUCT,
+  PATH_SELLING,
+  PATH_STAFF,
+} from 'src/general/constants/path';
 
 const openedMixin = (theme: Theme): CSSObject => ({
   width: AppConstants.sidebarWidth,
@@ -113,7 +119,8 @@ export default function Sidebar() {
           {
             type: 'item',
             text: 'Tạo đơn hàng',
-            path: '/admin/orders/create',
+            path: PATH_SELLING.SELLING_CREATING,
+            navType: '_blank',
           },
         ],
       },
@@ -166,6 +173,12 @@ export default function Sidebar() {
           },
         ],
       },
+      {
+        type: 'item',
+        text: 'Nhân viên',
+        icon: <PermIdentityOutlinedIcon sx={{ fontSize: '2rem' }} />,
+        path: PATH_STAFF.STAFF_LIST_PATH,
+      },
     ];
   }, []);
   useMemo(() => {
@@ -199,7 +212,7 @@ export default function Sidebar() {
           open ? 'justify-content-between' : 'justify-content-center'
         }`}
       >
-        {open && <Box sx={{ fontWeight: '900', fontSize: '1.8rem' }}>SHOPMANAGE</Box>}
+        {open && <Box sx={{ fontWeight: '900', fontSize: '1.8rem' }}>BARO</Box>}
         <IconButton className="chevronIcon hover__effect" onClick={handleDrawer}>
           {!open ? <ChevronRightIcon sx={{ color: '#fff' }} /> : <ChevronLeftIcon sx={{ color: '#fff' }} />}
         </IconButton>
@@ -219,7 +232,10 @@ export default function Sidebar() {
                     borderRadius: '6px',
                   }}
                   onClick={() => {
-                    !item?.subMenuItems && navigate(item.path);
+                    !item?.subMenuItems &&
+                      (item.path === PATH_SELLING.SELLING_CREATING
+                        ? window.open(PATH_SELLING.SELLING_CREATING, '_blank')
+                        : navigate(item.path));
                     openSubMenu !== item.text ? setOpenSubMenu(item.text) : setOpenSubMenu('');
                   }}
                 >
@@ -253,51 +269,55 @@ export default function Sidebar() {
                     minHeight: '0px',
                   }}
                 >
-                  {item?.subMenuItems.map((menuItem, index) => (
-                    <ListItem key={index} disablePadding sx={{ display: 'block' }}>
-                      <ListItemButton
-                        className={`hover__effect sub__menu__item${
-                          location.pathname == menuItem.path ? '__active' : ''
-                        }`}
-                        onClick={() => {
-                          navigate(menuItem.path);
-                        }}
-                        sx={{
-                          minHeight: 48,
-                          justifyContent: open ? 'initial' : 'center',
-                          px: 2.5,
-                          mb: 0.5,
-                          borderRadius: '6px',
-                          color: location.pathname == menuItem.path ? '#fff' : '#eeeeeeb3',
-                          backgroundColor: location.pathname == menuItem.path ? '#3f4857' : 'transparent',
-                        }}
-                      >
-                        <ListItemIcon
-                          className=""
+                  <ul>
+                    {item?.subMenuItems.map((menuItem, index) => (
+                      <ListItem key={index} disablePadding sx={{ display: 'block' }}>
+                        <ListItemButton
+                          className={`hover__effect sub__menu__item${
+                            location.pathname == menuItem.path ? '__active' : ''
+                          }`}
+                          onClick={() => {
+                            menuItem.path === PATH_SELLING.SELLING_CREATING ? 
+                            window.open(PATH_SELLING.SELLING_CREATING, '_blank') :
+                            navigate(menuItem.path);
+                          }}
                           sx={{
-                            minWidth: 0,
-                            mr: open ? 3 : 'auto',
-                            justifyContent: 'center',
+                            minHeight: 48,
+                            justifyContent: open ? 'initial' : 'center',
+                            px: 2.5,
+                            mb: 0.5,
+                            borderRadius: '6px',
+                            color: location.pathname == menuItem.path ? '#fff' : '#eeeeeeb3',
+                            backgroundColor: location.pathname == menuItem.path ? '#3f4857' : 'transparent',
                           }}
                         >
-                          <FiberManualRecordIcon
-                            className="sub__menu__icon"
+                          <ListItemIcon
+                            className=""
                             sx={{
-                              ml: 1,
-                              color: '#fff',
+                              minWidth: 0,
+                              mr: open ? 3 : 'auto',
+                              justifyContent: 'center',
+                            }}
+                          >
+                            <FiberManualRecordIcon
+                              className="sub__menu__icon"
+                              sx={{
+                                ml: 1,
+                                color: '#fff',
+                              }}
+                            />
+                          </ListItemIcon>
+                          <ListItemText
+                            primary={menuItem.text}
+                            sx={{
+                              opacity: open ? 1 : 0,
+                              fontSize: '0.8rem',
                             }}
                           />
-                        </ListItemIcon>
-                        <ListItemText
-                          primary={menuItem.text}
-                          sx={{
-                            opacity: open ? 1 : 0,
-                            fontSize: '0.8rem',
-                          }}
-                        />
-                      </ListItemButton>
-                    </ListItem>
-                  ))}
+                        </ListItemButton>
+                      </ListItem>
+                    ))}
+                  </ul>
                 </Collapse>
               )}
             </ListItem>

@@ -1,0 +1,11 @@
+.error-field {
+    & input {
+
+        // border: 1px solid #e70202;
+    }
+    .MuiOutlinedInput-notchedOutline{
+        & span {
+            color: #e70202
+        }
+    }
+}

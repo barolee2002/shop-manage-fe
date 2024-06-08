@@ -15,7 +15,7 @@ export const ENDPOINTS_STOCK_TAKE = {
   GET_STOCK_TAKE_LIST_ENDPOINT: 'stock-take/get-all',
   UPDATE: 'stock-take/updating',
   CREATE_RECEIPT_ENDPOINT: 'stock-take/creating',
-  RECEIPT_DETAIL: 'stock-take/detail/:id',
+  STOCK_TAKE_DETAIL: 'stock-take/detail/:id',
   DELETE: 'stock-take/delete/:id',
   UPDATE_INVENTORY: 'stock-take/inventory/:id',
 };
@@ -26,8 +26,27 @@ export const ENDPOINTS_SUPPLIER = {
 
 export const ENDPOINT_USER = {
   GET_USER_LIST_ENDPOINT: 'user/get-all/:storeId',
+  GET_DETAIL: 'user/:id',
+  CREATE_USER: 'user/signup',
+  CREATE_STAFF: 'user/staff',
+  UPDATE_USER: 'user/updating/:id',
+  GET_USER_PAGE: 'user/get-page/:storeId',
 };
 
 export const HISTORY_ENDPOINT = {
   ACTION_HISTORY_ENDPOINT: 'action-history/add',
+};
+
+export const AUTH_ENDPOINTS = {
+  LOGIN_ENDPOINT: 'user/login',
+  LOGOUT_ENDPOINT: 'user/logout',
+};
+
+export const SELLING_ENDPOINTS = {
+  CREATE_SELLING: 'selling-order/creating',
+  GET_SELLING_TIKETS: 'selling-order/list-all/:storeId',
+};
+
+export const CUSTOMER_ENDPOINTS = {
+  GET_CUSTOMERS: 'customer/list-all/:storeId',
 };

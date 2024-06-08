@@ -1,0 +1,12 @@
+.product-item {
+  padding: 24px !important;
+  cursor: pointer;
+  &:hover {
+    background-color: #ddd;
+  }
+  .attribute-image {
+    width: 120px;
+    height: 120px;
+    object-fit: cover;
+  }
+}

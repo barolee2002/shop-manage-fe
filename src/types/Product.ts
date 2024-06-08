@@ -1,13 +1,14 @@
 import { metaData } from './MetaData';
 
 export type FilterProductType = {
-  storeId: number;
-  searchString: string;
-  category: string;
-  page: number;
-  inventoryId: number;
-  fromTime: string;
-  toTime: string;
+  storeId?: number;
+  searchString?: string;
+  category?: string;
+  page?: number;
+  pageSize?:number;
+  inventoryId?: number;
+  fromTime?: string;
+  toTime?: string;
 };
 export type ProductAttributeType = {
   id: number;
@@ -26,7 +27,7 @@ export type ProductAttributeType = {
 };
 export type ProductList = {
   data: ProductType[];
-  metadata: metaData;
+  metaData: metaData;
 };
 export type ProductType = {
   id: number;

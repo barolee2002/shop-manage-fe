@@ -1,9 +1,11 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import axiosClient from 'src/api/axiosClient';
 import { ENDPOINTS_RECEIPT } from 'src/general/constants/endpoints';
 import { ReceiptsType } from 'src/types/ReceiptType';
 
-const useGetReceiptProduct = (id: string): [data: ReceiptsType, pending: boolean, fetchData: () => Promise<ReceiptsType>] => {
+const useGetReceiptProduct = (
+  id: string
+): [data: ReceiptsType, pending: boolean, fetchData: () => Promise<ReceiptsType>] => {
   const [isPendingGetReceiptProduct, setIsPendingGetReceiptProduct] = useState<boolean>(false);
   const [receiptDetail, setReceiptDetail] = useState<ReceiptsType>({} as ReceiptsType);
   const fetchApi = async (): Promise<ReceiptsType> => {
@@ -19,10 +21,8 @@ const useGetReceiptProduct = (id: string): [data: ReceiptsType, pending: boolean
     }
   };
   useEffect(() => {
-    console.log(4324234);
-    
     fetchApi();
-  },[])
+  }, []);
   return [receiptDetail, isPendingGetReceiptProduct, fetchApi];
 };
 

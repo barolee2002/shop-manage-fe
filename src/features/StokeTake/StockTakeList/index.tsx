@@ -6,19 +6,13 @@ import InputAdornment from '@mui/material/InputAdornment';
 import Select from '@mui/material/Select';
 import { BaseLayout } from 'src/general/components/BaseLayout';
 import CustomeTopbar from 'src/general/components/Topbar/CustomeTopbar';
-import useGetReceiptProductList from 'src/hook/receiptProduct/useGetReceiptProductList';
-import { FilterReceipt, ReceiptsType } from 'src/types/ReceiptType';
-import { testuser } from 'src/utils/test';
 import { metaData } from 'src/types/MetaData';
-import Loading from 'src/general/components/Loading';
-import useGetInventory from 'src/hook/useGetInventory';
 import { useDebounce } from 'src/hook/useDebounce';
 import Filter from 'src/general/components/Filter';
 import DateTimefield from 'src/general/components/Filter/DateTimefield';
 import SelectField from 'src/general/components/Filter/SelectField';
 import dayjs, { Dayjs } from 'dayjs';
 import { payStatusOptions } from 'src/general/constants/utils.constants';
-import NumberRangeField from 'src/general/components/Filter/NumberRangeField';
 import { getDayjsFormatDate } from 'src/utils/formatDate';
 import 'src/utils/screenBaseStyle/baseScreenStyle.scss';
 import CustomTable from 'src/general/components/Table/CustomeTable';
@@ -28,18 +22,20 @@ import useCreateActionHistory from 'src/hook/useCreateActionHistory';
 
 import { PATH_INVENTORY_TAKE_CARE } from 'src/general/constants/path';
 import useGetUsers from 'src/hook/user/useGetStaff';
-import useGetSuppliers from 'src/hook/supplier/useGetSuppliers';
 import { FilterStockTakeType, StockTakeType } from 'src/types/stokeTakeTypes';
 import useGetStockTakeList from 'src/hook/stockTake/useGetStokeTakeList';
 import { StockTakeColumn } from 'src/general/components/Table/TableColumn/TableColumns';
 import { updateStockTakeEdit } from '../StockTakeEdit/stockTakeSlice';
+import { useSelector } from 'react-redux';
+import { inventorySelector, userModelSelector } from 'src/redux/selector';
 
 const StockTakeList = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const [inventories, isPendingGetInventory] = useGetInventory(testuser.storeId);
-  const [staffs] = useGetUsers(testuser.storeId);
-  const [suppliers] = useGetSuppliers(testuser.storeId);
+  const userModel = useSelector(userModelSelector);
+
+  const inventories = useSelector(inventorySelector);
+  const { staffs } = useGetUsers(userModel.storeId);
   const [searchString, setSearchString] = useState<string>('');
   const searchValue = useDebounce(searchString);
   const [stockTakes, setStockTakes] = useState<StockTakeType[]>([]);
@@ -47,8 +43,8 @@ const StockTakeList = () => {
   const [metadata, setMetadata] = useState<metaData>({} as metaData);
 
   const [filterForm, setFilterForm] = useState<FilterStockTakeType>({
-    storeId: testuser.storeId,
-    inventoryId: testuser.storeId,
+    storeId: userModel.storeId,
+    inventoryId: inventories[0]?.id,
     searchString: searchValue,
     status: 2,
   } as FilterStockTakeType);
@@ -70,7 +66,7 @@ const StockTakeList = () => {
     handleChangeFilterForm('page', value);
   };
   const handleFetchData = useCallback(() => {
-    getStockTakeList({...filterForm, searchString: searchValue})
+    getStockTakeList({ ...filterForm, searchString: searchValue })
       .then((res) => {
         setStockTakes(() => {
           return res.data.map((data) => ({ ...data, key: data.id }));
@@ -141,26 +137,22 @@ const StockTakeList = () => {
               </Grid>
               <Grid container xs={12} gap={4} lg={3.6} justifyContent={'flex-end'}>
                 <div className="relative-block">
-                  {isPendingGetInventory ? (
-                    <Loading isLoading={isPendingGetInventory} />
-                  ) : (
-                    <FormControl>
-                      <InputLabel id="select-inventory">Kho</InputLabel>
-                      <Select
-                        label="Kho"
-                        size="small"
-                        labelId="select-inventory"
-                        value={filterForm.inventoryId}
-                        onChange={(e) => handleChangeFilterForm('inventoryId', e.target.value as number)}
-                      >
-                        {inventories?.map((inventory) => (
-                          <MenuItem key={inventory.id} value={inventory?.id}>
-                            {inventory.name}
-                          </MenuItem>
-                        ))}
-                      </Select>
-                    </FormControl>
-                  )}
+                  <FormControl>
+                    <InputLabel id="select-inventory">Kho</InputLabel>
+                    <Select
+                      label="Kho"
+                      size="small"
+                      labelId="select-inventory"
+                      value={filterForm.inventoryId}
+                      onChange={(e) => handleChangeFilterForm('inventoryId', e.target.value as number)}
+                    >
+                      {inventories?.map((inventory) => (
+                        <MenuItem key={inventory.id} value={inventory?.id}>
+                          {inventory.name}
+                        </MenuItem>
+                      ))}
+                    </Select>
+                  </FormControl>
                 </div>
                 <Filter onFilter={handleFilter}>
                   <React.Fragment>

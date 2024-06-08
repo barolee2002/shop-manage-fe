@@ -6,11 +6,9 @@ import { useLocation, useNavigate } from 'react-router';
 import { BaseLayout } from 'src/general/components/BaseLayout';
 import CustomeTopbar from 'src/general/components/Topbar/CustomeTopbar';
 import useGetSuppliers from 'src/hook/supplier/useGetSuppliers';
-import useGetInventory from 'src/hook/useGetInventory';
 import useGetUsers from 'src/hook/user/useGetStaff';
 import { NumericFormat } from 'react-number-format';
-import { receiptEditSelector } from 'src/redux/selector';
-import { testuser } from 'src/utils/test';
+import { inventorySelector, receiptEditSelector, userModelSelector } from 'src/redux/selector';
 import './ReceiptProductCreating.style.scss';
 import {
   addProductReceiptEdit,
@@ -40,25 +38,26 @@ const ReceiptCreating = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const current = dayjs();
+  const inventories = useSelector(inventorySelector);
+  const userModel = useSelector(userModelSelector);
   const { pageTitle, typeTitle, onTitleClick, typeFeature } = location.state;
   const receiptEdit = useSelector(receiptEditSelector);
   const [createActionHistory] = useCreateActionHistory();
   const [getProductList] = useGetProductList();
   const [createReceipt, isPendingCreateReceipt] = useCreateReceipt();
-  const [inventories, isPendingGetInventory] = useGetInventory(testuser.storeId);
-  const [staffs] = useGetUsers(testuser.storeId);
+  const { staffs } = useGetUsers(userModel.storeId);
   const [searchString, setSearchString] = useState<string>('');
   const [searchResult, setSearchResult] = useState<ProductList>({} as ProductList);
   const searchValue = useDebounce(searchString);
   const render = useRef(true);
-  const [suppliers] = useGetSuppliers(testuser.storeId);
+  const [suppliers] = useGetSuppliers(userModel.storeId);
 
   const handleBackPage = useCallback(() => {
     navigate(`${onTitleClick}`);
   }, [onTitleClick]);
   useEffect(() => {
     if (Object.keys(receiptEdit).length === 0 && receiptEdit.constructor === Object) {
-      dispatch(updateReceiptEdit({ ...initialReceipt, storeId: testuser.id }));
+      dispatch(updateReceiptEdit({ ...initialReceipt, storeId: userModel.id }));
     }
   }, [receiptEdit]);
   useEffect(() => {
@@ -72,8 +71,9 @@ const ReceiptCreating = () => {
   });
   const handleSearchProduct = () => {
     getProductList({
-      storeId: testuser.storeId,
+      storeId: userModel.storeId,
       searchString: searchValue,
+      inventoryId: receiptEdit?.inventory?.id,
     } as FilterProductType).then((res) => {
       setSearchResult(res);
     });
@@ -201,7 +201,7 @@ const ReceiptCreating = () => {
             <SelectField
               title="Nhân viên tạo"
               disable={true}
-              value={receiptEdit?.bookingUser?.id}
+              value={userModel.id}
               options={staffs.map((staff) => ({ value: staff.id, name: staff?.name }))}
               onChange={(value: number) => handleChangeStaff(value)}
               initialValue={initialSupplier}

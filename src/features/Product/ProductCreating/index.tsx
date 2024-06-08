@@ -1,13 +1,11 @@
 import {
   Box,
   TextField,
-  Fade,
   Tabs,
   Select,
   FormControl,
   MenuItem,
   InputLabel,
-  CircularProgress,
   Tab,
   Autocomplete,
   Button,
@@ -21,16 +19,14 @@ import { BaseLayout } from 'src/general/components/BaseLayout';
 import CustomeTopbar from 'src/general/components/Topbar/CustomeTopbar';
 import './productCreatingStyle.scss';
 import BaseDropzone from 'src/general/components/DropZone';
-import { productEditSelector } from 'src/redux/selector';
+import { inventorySelector, productEditSelector, userModelSelector } from 'src/redux/selector';
 import { ProductAttributeType, ProductType } from 'src/types/Product';
 import useGetCategory from 'src/hook/useGetCategory';
-import { testuser } from 'src/utils/test';
 import useBrand from 'src/hook/useGetBrand';
 import { NumericFormat } from 'react-number-format';
 import { Add as AddIcon, Delete as DeleteIcon } from '@mui/icons-material';
 import { addAttributeEdit, changeAttributeEdit, changeValueEditProduct, updateProductEdit } from './productEditSlice';
 import { initialInventoryCost, initialProduct, initialProductAttribute } from 'src/utils/initialValue';
-import useGetInventory from 'src/hook/useGetInventory';
 import useUploadImage from 'src/hook/upLoadImage';
 import getImageUrl from 'src/utils/getImageUrl';
 import getImageFile from 'src/utils/getImageFile';
@@ -42,11 +38,12 @@ const ProductCreating = () => {
   const location = useLocation();
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const { pageTitle, typeTitle, onTitleClick, typeFeature } = location.state;
+  const userModel = useSelector(userModelSelector);
+  const { pageTitle, typeTitle, onTitleClick, typeFeature } = location.state ?? {};
   const productEdit: ProductType = useSelector(productEditSelector);
-  const [categories] = useGetCategory(testuser.storeId);
-  const [inventories, isPendingGetInventory] = useGetInventory(testuser.storeId);
-  const [brands] = useBrand(testuser.storeId);
+  const [categories] = useGetCategory(userModel.storeId);
+  const inventories = useSelector(inventorySelector);
+  const [brands] = useBrand(userModel.storeId);
   const [updateProduct, isPendingUpdateProduct] = useUpdateProduct();
   const [createProduct, isPendingCreateProduct] = useCreateProduct();
   const [uploadImage, isPendingUploadImage] = useUploadImage();
@@ -115,7 +112,7 @@ const ProductCreating = () => {
       inventoryList: prev.inventoryList.filter((_, index) => index !== indexNumber),
     }));
   };
-  const handleChangeAttribute = (title: string, value: string) => {
+  const handleChangeAttribute = (title: string, value: any) => {
     setAttribute((prev: ProductAttributeType) => ({
       ...prev,
       [title]: value,
@@ -136,13 +133,13 @@ const ProductCreating = () => {
   const fixDataPost = React.useMemo(
     () => async (productEdit: ProductType, attribute: ProductAttributeType) => {
       const link = productEdit.imageLink
-        ? await uploadImage(await getImageFile(productEdit.imageLink, `${testuser.storeId}/${productEdit.name}`))
+        ? await uploadImage(await getImageFile(productEdit.imageLink, `${userModel.storeId}/${productEdit.name}`))
         : '';
       const attributes = await Promise.all(
         productEdit.attributes.map(async (attribute) => ({
           ...attribute,
           imageLink: attribute.imageLink
-            ? await uploadImage(await getImageFile(attribute.imageLink, `${testuser.storeId}/${productEdit.name}`))
+            ? await uploadImage(await getImageFile(attribute.imageLink, `${userModel.storeId}/${productEdit.name}`))
             : '',
         }))
       );
@@ -151,14 +148,14 @@ const ProductCreating = () => {
         ...attribute,
         imageLink: attribute.imageLink
           ? ((await uploadImage(
-              await getImageFile(attribute.imageLink, `${testuser.storeId}/${productEdit.name}`)
+              await getImageFile(attribute.imageLink, `${userModel.storeId}/${productEdit.name}`)
             )) as string)
           : '',
       };
       const data = {
         ...productEdit,
         imageLink: link as string,
-        storeId: testuser.storeId,
+        storeId: userModel.storeId,
         attributes: attributes.map((oldAttribute, index) => {
           return index === tabValue ? newData : oldAttribute;
         }) as ProductAttributeType[],
@@ -345,6 +342,7 @@ const ProductCreating = () => {
               />
             </Box>
           </Box>
+          
           <Box className="extension-setup">
             <Box className="extension-setup-item">
               {attribute.otherAttribute &&
@@ -387,77 +385,36 @@ const ProductCreating = () => {
               </Button>
             </Box>
             <Box className="extension-setup-item">
-              {attribute.inventoryList &&
-                attribute.inventoryList.map((inventory, index) => (
-                  <Box key={index} className="extension-setup-item-row">
-                    {isPendingGetInventory ? (
-                      <Fade in={isPendingGetInventory}>
-                        <CircularProgress size={30} />
-                      </Fade>
-                    ) : (
-                      <FormControl sx={{ width: '40%' }}>
-                        <InputLabel id="select-inventory">Kho</InputLabel>
-                        <Select
-                          label="Kho"
-                          labelId="select-inventory"
-                          value={inventory.inventory.id ? inventory.inventory.id : -1}
-                          onChange={(e) =>
-                            handleSetInventory(
-                              index,
-                              'inventory',
-                              inventories.find((inventory) => inventory.id === (e.target.value as number))
-                            )
-                          }
-                        >
-                          <MenuItem value={-1}>Chọn kho</MenuItem>
-                          {inventories?.map((inventory) => (
-                            <MenuItem key={inventory.id} value={inventory.id}>
-                              {inventory.name}
-                            </MenuItem>
-                          ))}
-                        </Select>
-                      </FormControl>
-                    )}
-                    <NumericFormat
-                      thousandSeparator=","
-                      customInput={TextField}
-                      value={inventory.costPrice === 0 ? null : inventory.costPrice}
-                      label="Giá nhập"
-                      InputProps={{
-                        endAdornment: (
-                          <InputAdornment position="end">
-                            <p>đ</p>
-                          </InputAdornment>
-                        ),
-                      }}
-                      onChange={(e) =>
-                        handleSetInventory(index, 'costPrice', parseInt(e.target.value.replace(/,/g, '')))
-                      }
-                    />
-                    <NumericFormat
-                      thousandSeparator=","
-                      customInput={TextField}
-                      value={inventory.sellPrice === 0 ? null : inventory.sellPrice}
-                      label="Giá bán"
-                      InputProps={{
-                        endAdornment: (
-                          <InputAdornment position="end">
-                            <p>đ</p>
-                          </InputAdornment>
-                        ),
-                      }}
-                      onChange={(e) =>
-                        handleSetInventory(index, 'sellPrice', parseInt(e.target.value.replace(/,/g, '')))
-                      }
-                    />
-                    <IconButton size="large" onClick={() => handleDeleteInventory(index)}>
-                      <DeleteIcon fontSize="inherit" />
-                    </IconButton>
-                  </Box>
-                ))}
-              <Button variant="outlined" onClick={handleAddInventory}>
-                <AddIcon fontSize="inherit" /> Thêm thuộc tính
-              </Button>
+              <Box className="extension-setup-item-row">
+                <NumericFormat
+                  thousandSeparator=","
+                  customInput={TextField}
+                  value={attribute.costPrice === 0 ? null : attribute.costPrice}
+                  label="Giá nhập"
+                  InputProps={{
+                    endAdornment: (
+                      <InputAdornment position="end">
+                        <p>đ</p>
+                      </InputAdornment>
+                    ),
+                  }}
+                  onChange={(e) => handleChangeAttribute('costPrice', parseInt(e.target.value.replace(/,/g, '')))}
+                />
+                <NumericFormat
+                  thousandSeparator=","
+                  customInput={TextField}
+                  value={attribute.sellPrice === 0 ? null : attribute.sellPrice}
+                  label="Giá bán"
+                  InputProps={{
+                    endAdornment: (
+                      <InputAdornment position="end">
+                        <p>đ</p>
+                      </InputAdornment>
+                    ),
+                  }}
+                  onChange={(e) => handleChangeAttribute('sellPrice', parseInt(e.target.value.replace(/,/g, '')))}
+                />
+              </Box>
             </Box>
           </Box>
         </Box>

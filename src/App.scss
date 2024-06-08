@@ -13,13 +13,13 @@
 }
 .susscess-status {
   padding: 6px 12px;
-  border: 1px solid $success-color;
+  border: 2px solid $success-color;
   border-radius: 16px;
   text-align: center;
 }
 .error-color {
   padding: 6px 12px;
-  border: 1px solid $error-color;
+  border: 2px solid $error-color;
   border-radius: 16px;
   text-align: center;
 }
@@ -33,12 +33,24 @@
 .m-auto {
   margin: auto;
 }
+.text-center{
+  text-align: center;
+}
+.center-col{
+  display: flex;
+  align-items: center;
+}
+.MuiIconButton-root {
+  padding: 8px 14px !important;
+}
 @media (prefers-reduced-motion: no-preference) {
   .App-logo {
     animation: App-logo-spin infinite 20s linear;
   }
 }
-
+.Mui-disabled.MuiInputBase-input{
+  color: #000 !important;
+}
 .App-header {
   background-color: #282c34;
   min-height: 100vh;
@@ -84,6 +96,14 @@
   width: 70%;
   text-align: start;
 }
+.mb24{
+  margin-bottom: 24px;
+}
+.error-validate {
+  color:#e70202;
+  text-align: start;
+  margin-top: 4px;
+}
 .relative-block {
   position: relative;
   min-width: 50px;
@@ -103,6 +123,24 @@
 }
 .mb16{
   margin-bottom: 16px;
+}
+.d-block {
+  display: block;
+}
+.old-price {
+  text-decoration-line: line-through;
+}
+.mt12{
+  margin-top: 12px !important;
+}
+.text-start {
+  text-align: start;
+}
+.bill-row{
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  margin-top: 12px;
+  padding: 4px;
 }
 .header-title2{
   font-size: 16px;
@@ -129,6 +167,16 @@
     padding: 0;
     text-align: center;
   }
+}
+.d-flex {
+  display: flex;
+  justify-content: space-between;
+}
+.bill-title{
+  width: 100%;
+  text-align: center;
+  font-size: 18px;
+  font-weight: 700;
 }
 .modal-wrapper {
   &-headding {
@@ -210,6 +258,9 @@
   display: flex;
   gap: 0 25px;
 }
+.fz-11 {
+  font-size: 11px;
+}
 .title-2 {
   font-size: 18px;
   white-space: nowrap;
@@ -221,6 +272,11 @@
 }
 .MuiTab-root {
   font-size: 14px !important;
+}
+@media print {
+  .no-print {
+    display: none;
+  }
 }
 @keyframes App-logo-spin {
   from {

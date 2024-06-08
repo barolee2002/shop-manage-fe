@@ -14,7 +14,7 @@ interface Props {
   title: string;
   value: any;
   options: options[];
-  onChange: (value: any) => void;
+  onChange?: (value: any) => void;
   initialValue?: any;
   disable?: boolean;
 }
@@ -22,7 +22,7 @@ interface Props {
 const SelectField = (props: Props) => {
   const { disable = false } = props;
   const handleChangeValue = (event: SelectChangeEvent) => {
-    props.onChange(event.target.value);
+    props.onChange&&props.onChange(event.target.value);
   };
 
   return (

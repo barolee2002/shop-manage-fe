@@ -1,20 +1,27 @@
 import React from 'react';
+import { useDispatch } from 'react-redux';
 import axiosClient from 'src/api/axiosClient';
+import { updateInventory } from 'src/features/Auth/screens/SignInScreen/inventorySlice';
+
 import { inventoryType } from 'src/types/inventory';
 
-const useGetInventory = (id: number) : [inventoryType[], boolean] => {
-  const [inventories, setInventories] = React.useState<inventoryType[]>([]);
-  const [isPendingGetInventory, setIsPendingGetInventory] = React.useState(true);
+const useGetInventory = (): {
+  getInventories: (id: number) => Promise<inventoryType[]>;
+} => {
+  const dispatch = useDispatch();
 
-  React.useEffect(() => {
-    axiosClient
-      .get(`inventory/get-all/${id}`)
-      .then((response) => setInventories(response.data))
-      .then(() => setIsPendingGetInventory(false))
-      .catch((err) => console.log(err));
-  }, [id]);
+  const handleGetInventory = async (inventoryId: number): Promise<inventoryType[]> => {
+    try {
+      const response = await axiosClient.get<inventoryType[]>(`inventory/get-all/${inventoryId}`);
+      dispatch(updateInventory(response.data));
+      return response.data;
+    } catch (err) {
+      console.log(err);
+      throw err;
+    }
+  };
 
-  return  [inventories, isPendingGetInventory] ;
+  return {getInventories: handleGetInventory };
 };
 
 export default useGetInventory;

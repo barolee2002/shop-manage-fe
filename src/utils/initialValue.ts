@@ -1,7 +1,9 @@
 import { PaymentType, metaData } from 'src/types/MetaData';
 import { ProductAttributeType, ProductType, InventoryType, InventoryCost } from 'src/types/Product';
 import { ReceiptsType, ReiceptProductType } from 'src/types/ReceiptType';
+import { CustomerType } from 'src/types/customer.type';
 import { inventoryType } from 'src/types/inventory';
+import { OrderDetailType, SellingOrderType } from 'src/types/selling.type';
 import { FilterStockTakeType, StockTakeDetailType, StockTakeList, StockTakeType } from 'src/types/stokeTakeTypes';
 import { SupplierType } from 'src/types/supplier.type';
 import { UserType } from 'src/types/user.type';
@@ -68,7 +70,6 @@ export const initialPayment: PaymentType[] = [
   },
 ];
 
-
 export const initialReceiptProduct: ReiceptProductType = {
   id: 0,
   receiptId: 0,
@@ -97,8 +98,11 @@ export const initialUser: UserType = {
   email: '',
   address: '',
   username: '',
+  inventoryId:0,
+  avatar:'',
   role: '',
   storeId: 0,
+  actionHistories:[]
 };
 
 export const initialReceipt: ReceiptsType = {
@@ -133,7 +137,7 @@ export const initialFilterStockTake: FilterStockTakeType = {
   createFromTime: '',
   createToTime: '',
   updateFromTime: '',
-  updateToTime: ''
+  updateToTime: '',
 };
 
 // Initial value for StockTakeDetailType
@@ -143,7 +147,7 @@ export const initialStockTakeDetail: StockTakeDetailType = {
   productAttribute: initialProductAttribute,
   oldQuantity: 0,
   actualQuantity: 0,
-  reason: ''
+  reason: '',
 };
 
 // Initial value for StockTakeType
@@ -151,20 +155,48 @@ export const initialStockTake: StockTakeType = {
   id: 0,
   key: 0,
   code: '',
-  createUser: initialUser,
-  confirmUser: initialUser,
+  create: initialUser,
+  confirm: initialUser,
   inventory: initialInventory,
   storeId: 0,
   status: 0,
   createAt: '',
   updateAt: '',
-  details: [initialStockTakeDetail]
+  details: [initialStockTakeDetail],
 };
 
 // Initial value for StockTakeList
 export const initialStockTakeList: StockTakeList = {
   data: [initialStockTake],
-  metaData: {} as metaData
+  metaData: {} as metaData,
+};
+export const initialCustomer: CustomerType = {
+  id: 0,
+  code: '',
+  name: '',
+  phone: '',
+  storeId: 0,
+  createAt: '',
+};
+
+export const initialOrderDetail: OrderDetailType = {
+  id: 0,
+  product: initialProductAttribute,
+  discount: 0,
+  price: 0,
+  quantity: 1,
 };
 
 // Now you can use these initial values in your components or other parts of your code
+export const initialOrder: SellingOrderType = {
+  id: 0,
+  code: '',
+  customer: initialCustomer,
+  staff: initialUser,
+  inventory: initialInventory,
+  total: 0,
+  paymentType: 'MONEY',
+  discount: 0,
+  createAt: '',
+  details: [initialOrderDetail],
+};

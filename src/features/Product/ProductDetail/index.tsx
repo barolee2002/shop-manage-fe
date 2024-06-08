@@ -92,27 +92,12 @@ export default function ProductDetail() {
     () =>
       productDetail.attributes?.map((attribute) => {
         const quantity = attribute.inventoryList?.reduce((total, inventory) => total + inventory.quantity, 0);
-        const maxCostPrice = attribute.inventoryList?.reduce((max, inventory) => {
-          return max < inventory.costPrice ? (max = inventory.costPrice) : max;
-        }, 0);
-        const minCostPrice = attribute.inventoryList?.reduce((max, inventory) => {
-          return max > inventory.costPrice ? (max = inventory.costPrice) : max;
-        }, 1000000000000000);
-        const maxSellPrice = attribute.inventoryList?.reduce((max, inventory) => {
-          return max < inventory.sellPrice ? (max = inventory.sellPrice) : max;
-        }, 0);
-        const minSellPrice = attribute.inventoryList?.reduce((max, inventory) => {
-          return max > inventory.sellPrice ? (max = inventory.sellPrice) : max;
-        }, 100000000000000);
-        // const sellPrice = attribute.inventoryList?.reduce((total, inventory) => total + inventory.sellPrice, 0);
         return {
           ...attribute,
           key: attribute.id,
           quantity: quantity,
           inventory: attribute?.inventoryList.length === 1 ? attribute?.inventoryList[0].inventory.name : '',
           subTableRow: attribute.inventoryList,
-          costPrice: maxCostPrice === minCostPrice ? maxCostPrice : `${minCostPrice} - ${maxCostPrice}`,
-          sellPrice: maxSellPrice === minSellPrice ? maxSellPrice : `${minSellPrice} - ${maxSellPrice}`,
         };
       }),
     [productDetail]

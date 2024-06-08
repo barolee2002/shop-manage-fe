@@ -29,8 +29,8 @@ export type StockTakeType = {
   id: number;
   key: number;
   code: string;
-  createUser: UserType;
-  confirmUser: UserType;
+  create: UserType;
+  confirm: UserType;
   inventory: inventoryType;
   storeId: number;
   status: number;
