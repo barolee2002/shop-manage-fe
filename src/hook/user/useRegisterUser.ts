@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import axiosClient from 'src/api/axiosClient';
-import { ENDPOINTS_STOCK_TAKE, ENDPOINT_USER } from 'src/general/constants/endpoints';
+import { STOCK_TAKE_ENDPOINTS, ENDPOINT_USER } from 'src/general/constants/endpoints';
 import { UserType } from 'src/types/user.type';
 
 const useCreateUser = (): {

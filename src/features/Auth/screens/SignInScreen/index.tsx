@@ -1,6 +1,6 @@
 import React, { memo, useState } from 'react';
 import './style.scss';
-import { Button, Grid, TextField } from '@mui/material';
+import { Button, Divider, Grid, TextField } from '@mui/material';
 import useAuth from 'src/hook/auth/useAuth';
 import { LoginType } from 'src/types/auth.type';
 import { useDispatch } from 'react-redux';
@@ -8,8 +8,9 @@ import { useNavigate } from 'react-router';
 import { userLogin } from './authenSlice';
 import { setCookie } from 'src/utils/Cookie';
 import { updateAxiosAccessToken } from 'src/api/axiosClient';
-import { PATH_PRODUCT } from 'src/general/constants/path';
-import useGetInventory from 'src/hook/useGetInventory';
+import { PATH_AUTH, PATH_PRODUCT } from 'src/general/constants/path';
+import useGetInventory from 'src/hook/inventory/useGetInventory';
+import { Link } from 'react-router-dom';
 
 const SignInScreen = () => {
   const dispatch = useDispatch();
@@ -24,7 +25,7 @@ const SignInScreen = () => {
       updateAxiosAccessToken(res.token);
       await getInventories(res.storeId);
       setCookie('userInfo', encodeURIComponent(JSON.stringify({ ...res, userId: res.id })), 1);
-      navigate(PATH_PRODUCT.PRODUCT_LIST_PATH);
+      navigate('/main/management/dashboard');
     });
   };
   return (
@@ -36,19 +37,28 @@ const SignInScreen = () => {
             e.preventDefault();
           }}
         > */}
-        <Grid container gap={3} flexDirection={'column'} className="signin-container-wrapper">
-          <Grid container gap={2} flexDirection={'column'}>
-            <p>Tên đăng nhập</p>
-            <TextField fullWidth value={username} onChange={(e) => setUsername(e.target.value)} />
+        <form action="" onSubmit={handleLogin}>
+          <Grid container gap={3} flexDirection={'column'} className="signin-container-wrapper">
+            <Grid container gap={2} flexDirection={'column'}>
+              <p className="text-start">Tên đăng nhập</p>
+              <TextField fullWidth value={username} onChange={(e) => setUsername(e.target.value)} />
+            </Grid>
+            <Grid container gap={2} flexDirection={'column'}>
+              <p className="text-start">Mật khẩu</p>
+              <TextField type="password" fullWidth value={password} onChange={(e) => setPassword(e.target.value)} />
+            </Grid>
+            <Button variant="contained" disabled={isPendingLogin} type="submit" onClick={handleLogin}>
+              Đăng nhập
+            </Button>
           </Grid>
-          <Grid container gap={2} flexDirection={'column'}>
-            <p>Tên đăng nhập</p>
-            <TextField fullWidth value={password} onChange={(e) => setPassword(e.target.value)} />
-          </Grid>
-          <Button variant="contained" disabled={isPendingLogin} type="submit" onClick={handleLogin}>
-            Đăng nhập
-          </Button>
-        </Grid>
+        </form>
+        <Divider />
+        <p className="mt-4 fz-14 text-start">
+          Bạn chưa có tài khoản?{' '}
+          <Link color="primary" to={PATH_AUTH.REGISTER}>
+            Đăng ký ngay
+          </Link>
+        </p>
         {/* </form> */}
       </Grid>
     </Grid>

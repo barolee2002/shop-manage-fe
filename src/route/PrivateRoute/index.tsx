@@ -2,7 +2,7 @@
 import { useDispatch } from 'react-redux';
 import { Navigate } from 'react-router-dom';
 import { userLogin } from 'src/features/Auth/screens/SignInScreen/authenSlice';
-import useGetInventory from 'src/hook/useGetInventory';
+import useGetInventory from 'src/hook/inventory/useGetInventory';
 import { UserLogin } from 'src/types/user.type';
 
 import { getCookie } from 'src/utils/Cookie';

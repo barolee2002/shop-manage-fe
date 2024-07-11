@@ -37,4 +37,19 @@ export const staffRoles = [
     value: 'CUSTOMER',
     name: 'Nhân viên chăm sóc khách hàng',
   },
-]
+];
+export const stockManagementTime = [
+  {
+    title: '1 tuần',
+    value: 'WEEK',
+  },
+  {
+    title: '1 tháng',
+    value: 'MONTH',
+  },
+  {
+    title: '3 tháng',
+    value: 'THREE_MONTH',
+  },
+];
+export const stockManagilhjiklementQuantity = [10, 20, 50];

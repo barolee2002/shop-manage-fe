@@ -1,13 +1,11 @@
 import React, { memo, useCallback, useEffect, useState } from 'react';
 import { Box, InputLabel, FormControl, MenuItem, TextField, Grid } from '@mui/material';
-import { Search as SearchIcon, ModeEdit as ModeEditIcon } from '@mui/icons-material';
+import { Search as SearchIcon } from '@mui/icons-material';
 import InputAdornment from '@mui/material/InputAdornment';
 
 import Select from '@mui/material/Select';
 import { BaseLayout } from 'src/general/components/BaseLayout';
 import CustomeTopbar from 'src/general/components/Topbar/CustomeTopbar';
-import useGetReceiptProductList from 'src/hook/receiptProduct/useGetReceiptProductList';
-import { FilterReceipt, ReceiptsType } from 'src/types/ReceiptType';
 import { metaData } from 'src/types/MetaData';
 import { useDebounce } from 'src/hook/useDebounce';
 import Filter from 'src/general/components/Filter';
@@ -15,38 +13,37 @@ import DateTimefield from 'src/general/components/Filter/DateTimefield';
 import SelectField from 'src/general/components/Filter/SelectField';
 import { Dayjs } from 'dayjs';
 import useGetUsers from 'src/hook/user/useGetStaff';
-import useGetSuppliers from 'src/hook/supplier/useGetSuppliers';
-import { payStatusOptions } from 'src/general/constants/utils.constants';
 import NumberRangeField from 'src/general/components/Filter/NumberRangeField';
 import { getDayjsFormatDate } from 'src/utils/formatDate';
 import 'src/utils/screenBaseStyle/baseScreenStyle.scss';
 import CustomTable from 'src/general/components/Table/CustomeTable';
-import { ReceiptListColumn } from 'src/general/components/Table/TableColumn/TableColumns';
+import { SellingTicketColumn } from 'src/general/components/Table/TableColumn/TableColumns';
 import { useNavigate } from 'react-router';
-import { PATH_RECEIPT_PRODUCT } from 'src/general/constants/path';
 import { useDispatch } from 'react-redux';
 import useCreateActionHistory from 'src/hook/useCreateActionHistory';
 import { inventorySelector, userModelSelector } from 'src/redux/selector';
 import { useSelector } from 'react-redux';
+import useGetSellingTiketList from 'src/hook/selling/useGetSellingTiketList';
+import { OrderFilter, SellingOrderType } from 'src/types/selling.type';
+import { initialPayment } from 'src/utils/initialValue';
 
 const ReceiptProductList = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const userModel = useSelector(userModelSelector);
   const inventories = useSelector(inventorySelector);
-  const [getReceiptList, isPendingGetReceiptProductList] = useGetReceiptProductList();
+  const {getSellingTikets, isPendingGetSellingTickets} = useGetSellingTiketList(userModel.storeId);
   const { staffs } = useGetUsers(userModel.storeId);
   const [createActionHistory] = useCreateActionHistory();
-  const [suppliers] = useGetSuppliers(userModel.storeId);
   const [searchString, setSearchString] = useState<string>('');
   const searchValue = useDebounce(searchString);
-  const [filterForm, setFilterForm] = useState<FilterReceipt>({
+  const [filterForm, setFilterForm] = useState<OrderFilter>({
     storeId: userModel.storeId,
     inventoryId: inventories[0]?.id,
     searchString: searchValue,
-  } as FilterReceipt);
+  } as OrderFilter);
   const [metadata, setMetadata] = useState<metaData>({} as metaData);
-  const [receripts, setReceipts] = useState<ReceiptsType[]>([]);
+  const [sellingTickets, setSellingTickets] = useState<SellingOrderType[]>([]);
   const handleChangeFilterForm = (title: string, value: any) => {
     setFilterForm(() => ({
       ...filterForm,
@@ -62,50 +59,32 @@ const ReceiptProductList = () => {
   };
 
   const handleFetchData = useCallback(() => {
-    getReceiptList(filterForm)
+    getSellingTikets(filterForm)
       .then((res) => {
-        setReceipts(() => {
-          return res.data.map((data) => ({ ...data, key: data.id }));
+        setSellingTickets(() => {
+          return res?.data?.map((data) => ({ ...data, key: data.id }));
         });
         setMetadata(res.metaData);
       })
       .catch((err) => {
         console.log(err);
       });
-  }, [filterForm, getReceiptList]);
+  }, [filterForm, getSellingTikets]);
   useEffect(() => {
-    createActionHistory({ message: 'Màn hình danh sách đơn đặt hàng' });
+    createActionHistory({ message: 'Màn hình danh sách đơn bán hàng' });
   }, []);
   useEffect(() => {
     handleFetchData();
-  }, [filterForm.page, filterForm.inventoryId, searchValue]);
+  }, [filterForm.page, filterForm.inventoryId, searchValue, inventories]);
   const handleFilter = () => {
     handleFetchData();
   };
   const handleChangPage = (_: any, value: number) => {
     handleChangeFilterForm('page', value);
   };
-  const handleAddReceipt = () => {
-    dispatch(updateReceiptEdit({} as ReceiptsType));
-    navigate(PATH_RECEIPT_PRODUCT.RECEIPT_PRODUCT_CREATE_PATH, {
-      state: {
-        pageTitle: 'Quay về trang danh sách đơn hàng',
-        typeTitle: 'navigate',
-        onTitleClick: PATH_RECEIPT_PRODUCT.RECEIPT_PRODUCT_LIST_PATH,
-        typeFeature: 'create',
-      },
-    });
-  };
   return (
     <div className="list">
-      <BaseLayout
-        topbarChildren={
-          <CustomeTopbar
-            pageTitle="Danh sách đơn nhập kho"
-            buttonGroup={[{ buttonTitle: 'Tạo đơn hàng', onClick: handleAddReceipt }]}
-          />
-        }
-      >
+      <BaseLayout topbarChildren={<CustomeTopbar pageTitle="Danh sách phiếu mua hàng" />}>
         <Box className="content">
           <Box className="content-wrapper">
             <Grid container wrap="wrap" gap={4} className="content-wrapper-search">
@@ -152,40 +131,28 @@ const ReceiptProductList = () => {
                   <React.Fragment>
                     <SelectField
                       title="Nhân viên tạo"
-                      value={filterForm.bookingUserId}
+                      value={filterForm.staffId}
                       options={staffs.map((staff) => ({ value: staff.id, name: staff.name }))}
                       onChange={(value: number) => handleChangeFilterForm('bookingUserId', value)}
                     />
                     <SelectField
-                      title="Nhà cung cấp"
-                      value={filterForm.supplierId}
-                      options={suppliers.map((supplier) => ({ value: supplier.id, name: supplier.name }))}
-                      onChange={(value: number) => handleChangeFilterForm('confirmUserId', value)}
-                    />
-                    <SelectField
                       title="Thanh toán"
-                      value={filterForm.payStatus}
-                      options={payStatusOptions}
+                      value={filterForm.paymentType}
+                      options={initialPayment?.map((payment) => ({ name: payment.field, value: payment.type }))}
                       onChange={(value: number) => handleChangeFilterForm('payStatus', value)}
-                    />
-                    <SelectField
-                      title="Nhà cung cấp"
-                      value={filterForm.supplierId}
-                      options={suppliers.map((supplier) => ({ value: supplier.id, name: supplier.name }))}
-                      onChange={(value: number) => handleChangeFilterForm('confirmUserId', value)}
                     />
                     <NumberRangeField
                       title="Giá trị đơn"
-                      from={filterForm.fromTotal}
-                      to={filterForm.toTotal}
+                      from={filterForm.fromTotal ?? 0}
+                      to={filterForm.toTotal ?? 0}
                       onSetRange={(from: number, to: number) => handleSetRange('fromTotal', 'toTotal', from, to)}
                     />
                     <DateTimefield
-                      fromTime={getDayjsFormatDate(filterForm.bookingFromTime)}
-                      toTime={getDayjsFormatDate(filterForm.bookingToTime)}
+                      fromTime={getDayjsFormatDate(filterForm?.sellFromTime ?? '')}
+                      toTime={getDayjsFormatDate(filterForm?.sellToTime ?? '')}
                       title="Ngày đặt hàng"
                       onSetDate={(fromDate: Dayjs | null, toDate: Dayjs | null) =>
-                        handleSetRange('bookingFromTime', 'bookingToTime', fromDate, toDate)
+                        handleSetRange('sellFromTime', 'sellToTime', fromDate, toDate)
                       }
                     />
                   </React.Fragment>
@@ -196,9 +163,9 @@ const ReceiptProductList = () => {
               className="content-wrapper-table"
               pagination
               metadata={metadata}
-              columns={ReceiptListColumn}
-              rows={receripts}
-              loading={isPendingGetReceiptProductList}
+              columns={SellingTicketColumn}
+              rows={sellingTickets}
+              loading={isPendingGetSellingTickets}
               onChangePage={handleChangPage}
             />
           </Box>

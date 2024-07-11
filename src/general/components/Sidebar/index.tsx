@@ -19,16 +19,19 @@ import {
 } from '@mui/icons-material';
 import './style.scss';
 
-import { Link, Navigate, useLocation, useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 
 import { AppConstants } from '../../constants/AppConstants';
 import { Collapse } from '@mui/material';
 import {
+  PATH_CUSTOMER,
   PATH_INVENTORY_TAKE_CARE,
   PATH_PRODUCT,
   PATH_RECEIPT_PRODUCT,
   PATH_SELLING,
   PATH_STAFF,
+  PATH_STOCK_MANAGEMENT,
+  PATH_SUPPLIER,
 } from 'src/general/constants/path';
 
 const openedMixin = (theme: Theme): CSSObject => ({
@@ -104,7 +107,7 @@ export default function Sidebar() {
         type: 'item',
         text: 'Tổng quan',
         icon: <HomeOutlinedIcon sx={{ fontSize: '2rem' }} />,
-        path: '/main/dashboard',
+        path: '/main/management/dashboard',
       },
       {
         type: 'item',
@@ -114,7 +117,7 @@ export default function Sidebar() {
           {
             type: 'item',
             text: 'Danh sách đơn hàng',
-            path: '/admin/orders',
+            path: PATH_SELLING.SELLING_LIST,
           },
           {
             type: 'item',
@@ -137,7 +140,7 @@ export default function Sidebar() {
           {
             type: 'item',
             text: 'Quản lý kho',
-            path: '/admin/variants',
+            path: PATH_STOCK_MANAGEMENT.STOCK_MANAGEMENT,
           },
           {
             type: 'item',
@@ -154,24 +157,18 @@ export default function Sidebar() {
             text: 'Kiểm kê',
             path: PATH_INVENTORY_TAKE_CARE.INVENTORY_TAKE_CARE_LIST_PATH,
           },
+          {
+            type: 'item',
+            text: 'Nhà cung cấp',
+            path: PATH_SUPPLIER.SUPPLIER_LIST_PATH,
+          },
         ],
       },
       {
         type: 'item',
         text: 'Khách hàng',
         icon: <PermIdentityOutlinedIcon sx={{ fontSize: '2rem' }} />,
-        subMenuItems: [
-          {
-            type: 'item',
-            text: 'Danh sách khách hàng',
-            path: '/admin/customers',
-          },
-          {
-            type: 'item',
-            text: 'Nhóm khách hàng',
-            path: '/admin/customer-groups',
-          },
-        ],
+        path: PATH_CUSTOMER.CUSTOMER_LIST_PATH,
       },
       {
         type: 'item',
@@ -277,9 +274,9 @@ export default function Sidebar() {
                             location.pathname == menuItem.path ? '__active' : ''
                           }`}
                           onClick={() => {
-                            menuItem.path === PATH_SELLING.SELLING_CREATING ? 
-                            window.open(PATH_SELLING.SELLING_CREATING, '_blank') :
-                            navigate(menuItem.path);
+                            menuItem.path === PATH_SELLING.SELLING_CREATING
+                              ? window.open(PATH_SELLING.SELLING_CREATING, '_blank')
+                              : navigate(menuItem.path);
                           }}
                           sx={{
                             minHeight: 48,

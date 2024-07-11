@@ -28,6 +28,7 @@ const CustomeTopbar = (props: Props) => {
   const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
     setAnchorEl(event.currentTarget);
   };
+  const path = window.location.pathname;
   const { logout } = useAuth();
   const handleClose = () => {
     setAnchorEl(null);
@@ -65,23 +66,25 @@ const CustomeTopbar = (props: Props) => {
               {button.buttonTitle}
             </Button>
           ))}
-        <div>
-          <Button onClick={handleClick}>
-            <PersonIcon /> {userModel.name}
-          </Button>
-          <Menu
-            id="basic-menu"
-            anchorEl={anchorEl}
-            open={open}
-            onClose={handleClose}
-            MenuListProps={{
-              'aria-labelledby': 'basic-button',
-            }}
-          >
-            <MenuItem onClick={handleOpenDetailUser}>Thông tin tài khoản</MenuItem>
-            <MenuItem onClick={handleLogout}>Đăng xuất</MenuItem>
-          </Menu>
-        </div>
+        {path !== '/register' && (
+          <div>
+            <Button onClick={handleClick}>
+              <PersonIcon /> {userModel.name}
+            </Button>
+            <Menu
+              id="basic-menu"
+              anchorEl={anchorEl}
+              open={open}
+              onClose={handleClose}
+              MenuListProps={{
+                'aria-labelledby': 'basic-button',
+              }}
+            >
+              <MenuItem onClick={handleOpenDetailUser}>Thông tin tài khoản</MenuItem>
+              <MenuItem onClick={handleLogout}>Đăng xuất</MenuItem>
+            </Menu>
+          </div>
+        )}
       </div>
     </React.Fragment>
   );

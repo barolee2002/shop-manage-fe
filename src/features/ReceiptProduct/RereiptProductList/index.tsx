@@ -177,13 +177,13 @@ const ReceiptProductList = () => {
                     />
                     <NumberRangeField
                       title="Giá trị đơn"
-                      from={filterForm.fromTotal}
-                      to={filterForm.toTotal}
+                      from={filterForm?.fromTotal ?? 0}
+                      to={filterForm?.toTotal ?? 0}
                       onSetRange={(from: number, to: number) => handleSetRange('fromTotal', 'toTotal', from, to)}
                     />
                     <DateTimefield
-                      fromTime={getDayjsFormatDate(filterForm.bookingFromTime)}
-                      toTime={getDayjsFormatDate(filterForm.bookingToTime)}
+                      fromTime={getDayjsFormatDate(filterForm?.bookingFromTime??"")}
+                      toTime={getDayjsFormatDate(filterForm?.bookingToTime??"")}
                       title="Ngày đặt hàng"
                       onSetDate={(fromDate: Dayjs | null, toDate: Dayjs | null) =>
                         handleSetRange('bookingFromTime', 'bookingToTime', fromDate, toDate)

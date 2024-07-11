@@ -13,6 +13,12 @@ import { UserType } from 'src/types/user.type';
 import { payStatusOptions, staffRoles } from 'src/general/constants/utils.constants';
 import { formatPhoneNumber } from 'src/utils/phoneFormat';
 import { SellingOrderType } from 'src/types/selling.type';
+import { StockProductManagerment } from 'src/types/stokeManagement.type';
+import StockManagementNavigate from '../../NavigateItem/StockManagementNavigate';
+import { CustomerType } from 'src/types/customer.type';
+import CustomerNavigate from '../../NavigateItem/CustomerNavigate';
+import SupplierNameNavigate from '../../NavigateItem/SupplierNavigate';
+import { SupplierType } from 'src/types/supplier.type';
 export const productColumns = [
   { field: 'key', headerName: 'STT', headerClassName: 'content-wrapper-table-header', width: 90 },
   {
@@ -235,7 +241,7 @@ export const ReceiptListColumn = [
     field: 'total',
     headerName: 'Giá trị đơn',
     headerClassName: 'content-wrapper-table-header',
-    renderCell: (item: ReceiptsType) => <p>{item.total?.toLocaleString()} đ</p>,
+    renderCell: (item: ReceiptsType) => <p className="sell-price">{item.total?.toLocaleString()} đ</p>,
   },
   {
     field: 'payStatus',
@@ -386,7 +392,7 @@ export const StockTakeColumn = [
 export const StaffTableColumn = [
   {
     field: 'code',
-    headerName: 'Mã phiếu',
+    headerName: 'Mã nhân viên',
     headerClassName: 'content-wrapper-table-header',
   },
   {
@@ -421,7 +427,7 @@ export const StaffTableColumn = [
 export const HistoryColumn = [
   {
     field: 'createAt',
-    headerName: 'Lịch sử hoạt động ( Tối đa 20 họat động )',
+    headerName: 'Lịch sử hoạt động ( Tối đa 20 hoạt động )',
     renderCell: (item: any) => <p>{getformatDateTime(item?.createAt)}</p>,
   },
   {
@@ -432,8 +438,8 @@ export const HistoryColumn = [
 
 export const SellingTicketColumn = [
   {
-    field: 'name',
-    headerName: 'Tên sản phẩm',
+    field: 'code',
+    headerName: 'Mã phiếu',
     headerClassName: 'content-wrapper-table-header',
     flex: 1,
     renderCell: (params: SellingOrderType) => <SellingNavigate item={params} />,
@@ -443,34 +449,34 @@ export const SellingTicketColumn = [
     headerName: 'Khách hàng',
     headerClassName: 'content-wrapper-table-header',
     flex: 1,
-    renderCell: (params: SellingOrderType) => <p>{params.customer.name}</p>,
+    renderCell: (params: SellingOrderType) => <p>{params?.customer?.name}</p>,
   },
   {
     field: 'staff',
     headerName: 'Nhân viên',
     headerClassName: 'content-wrapper-table-header',
-    renderCell: (params: SellingOrderType) => <p>{params.staff.name}</p>,
+    renderCell: (params: SellingOrderType) => <p>{params?.staff?.name}</p>,
   },
   {
     field: 'inventory',
     headerName: 'Kho',
 
     headerClassName: 'content-wrapper-table-header',
-    renderCell: (params: SellingOrderType) => <p>{params.inventory.name}</p>,
+    renderCell: (params: SellingOrderType) => <p>{params?.inventory?.name}</p>,
   },
   {
     field: 'discount',
     headerName: 'Giảm giá',
     headerClassName: 'content-wrapper-table-header',
     flex: 1,
-    renderCell: (params: SellingOrderType) => <p>{params.discount} %</p>,
+    renderCell: (params: SellingOrderType) => <p>{params?.discount} %</p>,
   },
   {
     field: 'total',
     headerName: 'Tổng tiền',
     headerClassName: 'content-wrapper-table-header',
     flex: 1,
-    renderCell: (params: SellingOrderType) => <p>{params.total.toLocaleString()}</p>,
+    renderCell: (params: SellingOrderType) => <p>{params.total?.toLocaleString()}</p>,
   },
   {
     field: 'paymentType',
@@ -487,5 +493,129 @@ export const SellingTicketColumn = [
     headerClassName: 'content-wrapper-table-header',
     flex: 1,
     renderCell: (params: SellingOrderType) => <p>{getformatDate(params.createAt)}</p>,
+  },
+];
+export const StockManagementColumn = [
+  {
+    field: 'code',
+    headerName: 'Mã sản phẩm',
+    headerClassName: 'content-wrapper-table-header',
+    flex: 1,
+    renderCell: (params: StockProductManagerment) => <p>{params.code}</p>,
+  },
+  {
+    field: '',
+    headerName: 'Sản phẩm',
+    headerClassName: 'content-wrapper-table-header',
+    flex: 1,
+    renderCell: (params: StockProductManagerment) => <StockManagementNavigate item={params} />,
+  },
+  {
+    field: 'quantity',
+    headerName: 'Số lượng',
+    headerClassName: 'content-wrapper-table-header',
+    flex: 1,
+  },
+  {
+    field: 'costPrice',
+    headerName: 'Vốn tồn kho (đ)',
+    headerClassName: 'content-wrapper-table-header',
+    renderCell: (params: StockProductManagerment) => (
+      <p className="cost-price">{(params?.costPrice * params.quantity)?.toLocaleString()}</p>
+    ),
+  },
+  {
+    field: 'sellPrice',
+    headerName: 'Giá trị tồn (đ)',
+    headerClassName: 'content-wrapper-table-header',
+    renderCell: (params: StockProductManagerment) => (
+      <p className="sell-price">{(params?.sellPrice * params.quantity)?.toLocaleString()}</p>
+    ),
+  },
+];
+
+export const CustomerColumn = [
+  {
+    field: 'name',
+    headerName: 'Khách hàng',
+    headerClassName: 'content-wrapper-table-header',
+    flex: 1,
+    renderCell: (params: CustomerType) => <p>{params?.code}</p>,
+  },
+  {
+    field: 'code',
+    headerName: 'Mã khách hàng',
+    headerClassName: 'content-wrapper-table-header',
+    flex: 1,
+    renderCell: (params: CustomerType) => <CustomerNavigate item={params} />,
+  },
+  {
+    field: 'phone',
+    headerName: 'Số điện thoại',
+    headerClassName: 'content-wrapper-table-header',
+    renderCell: (params: CustomerType) => <p>{formatPhoneNumber(params.phone)}</p>,
+  },
+  {
+    field: 'totalOrder',
+    headerName: 'Số đơn mua',
+
+    headerClassName: 'content-wrapper-table-header',
+    renderCell: (params: CustomerType) => <p className="sell-price">{params?.totalOrder?.toLocaleString()}</p>,
+  },
+  {
+    field: 'totalMoney',
+    headerName: 'Số chi tiêu (đ)',
+    headerClassName: 'content-wrapper-table-header',
+    flex: 1,
+    renderCell: (params: CustomerType) => <p className="cost-price">{params?.totalMoney?.toLocaleString()}</p>,
+  },
+];
+
+export const SupplierColumn = [
+  {
+    field: 'name',
+    headerName: 'Tên nhà cung cấp',
+    headerClassName: 'content-wrapper-table-header',
+    flex: 1,
+    renderCell: (params: SupplierType) => <SupplierNameNavigate item={params} />,
+  },
+  {
+    field: 'address',
+    headerName: 'Địa chỉ',
+    headerClassName: 'content-wrapper-table-header',
+    flex: 1,
+  },
+  {
+    field: 'email',
+    headerName: 'Email',
+    headerClassName: 'content-wrapper-table-header',
+    flex: 1,
+  },
+  {
+    field: 'phone',
+    headerName: 'Số điện thoại',
+    headerClassName: 'content-wrapper-table-header',
+    renderCell: (params: SupplierType) => <p>{formatPhoneNumber(params.phone)}</p>,
+  },
+  {
+    field: 'deptMoney',
+    headerName: 'Nợ (đ)',
+
+    headerClassName: 'content-wrapper-table-header',
+    renderCell: (params: SupplierType) => <p className="sell-price">{params?.deptMoney?.toLocaleString()}</p>,
+  },
+  {
+    field: 'orderQuantity',
+    headerName: 'Số đơn đặt hàng',
+
+    headerClassName: 'content-wrapper-table-header',
+    renderCell: (params: SupplierType) => <p className="sell-price">{params?.orderQuantity?.toLocaleString()}</p>,
+  },
+  {
+    field: 'totalMoney',
+    headerName: 'Tổng chi (đ)',
+    headerClassName: 'content-wrapper-table-header',
+    flex: 1,
+    renderCell: (params: SupplierType) => <p className="cost-price">{params?.totalOrderMoney?.toLocaleString()}</p>,
   },
 ];

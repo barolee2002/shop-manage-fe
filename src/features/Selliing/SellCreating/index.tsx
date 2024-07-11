@@ -104,6 +104,7 @@ const SellingCreating = () => {
       const dataPost: SellingOrderType = {
         ...sellings[tabValue],
         staff: userModel as unknown as UserType,
+        storeId: userModel.storeId,
         details: sellings[tabValue]?.details?.filter((detail) => detail?.product?.id !== 0),
         total: getTotalPriceSelling(sellings[tabValue]),
       };

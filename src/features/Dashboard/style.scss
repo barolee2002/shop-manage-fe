@@ -1,0 +1,30 @@
+.dasdboard-wrapper {
+    background-color: #fff;
+    margin-top: 12px;
+    padding: 12px;
+    border-radius: 6px;
+    &-item {
+        .text-title {
+            font-size: 20px;
+            font-weight: 700;
+        }
+        padding: 24px;
+        border: 1px solid #ddd;
+        border-radius: 6px;
+
+
+    }
+    .navigate-text {
+        color: #05a5cd;
+        &:hover {
+            border-bottom: 1px solid #05a5cd;
+            margin-bottom: -1px;
+        }
+    }
+    .pay-time-chart{
+        padding: 36px
+    }
+    .css-fso5qs-MuiResponsiveChart-container{
+        padding: 24px;
+    }
+}

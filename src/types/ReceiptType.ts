@@ -5,22 +5,22 @@ import { SupplierType } from './supplier.type';
 import { UserType } from './user.type';
 
 export type FilterReceipt = {
-  storeId: number;
-  inventoryId: number;
-  bookingUserId: number;
-  confirmUserId: number;
-  payStatus: number;
-  receiptStatus: number;
-  page: number;
-  searchString: string;
-  pageSize: number;
-  supplierId: number;
-  bookingFromTime: string;
-  bookingToTime: string;
-  receiptFromTime: string;
-  receiptToTime: string;
-  fromTotal: number;
-  toTotal: number;
+  storeId?: number;
+  inventoryId?: number;
+  bookingUserId?: number;
+  confirmUserId?: number;
+  payStatus?: number;
+  receiptStatus?: number;
+  page?: number;
+  searchString?: string;
+  pageSize?: number;
+  supplierId?: number;
+  bookingFromTime?: string;
+  bookingToTime?: string;
+  receiptFromTime?: string;
+  receiptToTime?: string;
+  fromTotal?: number;
+  toTotal?: number;
 };
 
 export type ReiceptProductType = {

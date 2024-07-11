@@ -10,18 +10,18 @@ const useGetCustomers = (
   customers: CustomerType[];
   metadata: metaData;
   isPendingGetCustomers: boolean;
-  reFetchGetCustomers: ({ searchString }: { searchString: string }) => Promise<CustomerList>;
+  reFetchGetCustomers: ({ searchString, page }: { searchString: string; page?: number }) => Promise<CustomerList>;
 } => {
   const [customers, setCustomers] = useState<CustomerType[]>([]);
   const [metadata, setMetadata] = useState<metaData>({} as metaData);
   const [isPendingGetCustomers, setIsPendingGetCustomers] = useState<boolean>(false);
-  const fetchApi = async ({ searchString }: { searchString: string }): Promise<CustomerList> => {
+  const fetchApi = async ({ searchString, page }: { searchString: string; page?: number }): Promise<CustomerList> => {
     setIsPendingGetCustomers(true);
     try {
       const response = await axiosClient.get<CustomerList>(
         CUSTOMER_ENDPOINTS.GET_CUSTOMERS.replace(':storeId', storeId as unknown as string),
         {
-          params: { searchString },
+          params: { searchString, page },
         }
       );
       setIsPendingGetCustomers(false);

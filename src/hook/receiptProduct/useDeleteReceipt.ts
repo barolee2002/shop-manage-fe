@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import axiosClient from 'src/api/axiosClient';
-import { ENDPOINTS_RECEIPT } from 'src/general/constants/endpoints';
+import { RECEIPT_ENDPOINTS } from 'src/general/constants/endpoints';
 import { FilterReceipt, ReceiptsList } from 'src/types/ReceiptType';
 
 const useGetReceiptProductList = (): [(data: FilterReceipt) => Promise<ReceiptsList>, boolean] => {
@@ -8,7 +8,7 @@ const useGetReceiptProductList = (): [(data: FilterReceipt) => Promise<ReceiptsL
   const fetchApi = async (data: FilterReceipt): Promise<ReceiptsList> => {
     setIsPendingGetReceiptProductList(true);
     try {
-      const response = await axiosClient.get<ReceiptsList>(ENDPOINTS_RECEIPT.GET_RECEIPT_LIST_ENDPOINT, {
+      const response = await axiosClient.get<ReceiptsList>(RECEIPT_ENDPOINTS.GET_RECEIPT_LIST_ENDPOINT, {
         params: {
           ...data,
         },

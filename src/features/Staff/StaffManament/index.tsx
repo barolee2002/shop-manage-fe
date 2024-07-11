@@ -1,5 +1,5 @@
 import { Box, FormControl, Grid, InputAdornment, InputLabel, Menu, MenuItem, Select, TextField } from '@mui/material';
-import { memo, useEffect, useState } from 'react';
+import { memo, useEffect, useRef, useState } from 'react';
 import { BaseLayout } from 'src/general/components/BaseLayout';
 import CustomeTopbar from 'src/general/components/Topbar/CustomeTopbar';
 import CustomTable from 'src/general/components/Table/CustomeTable';
@@ -20,13 +20,14 @@ import { updateStaffEdit } from '../StaffEdit/staffSlice';
 
 const StaffManament = () => {
   const navigate = useNavigate();
-  const dispatch = useDispatch()
+  const dispatch = useDispatch();
   const [searchString, setSearchString] = useState<string>('');
   const searchValue = useDebounce(searchString);
   const userModel = useSelector(userModelSelector);
   const [role, setRole] = useState<string>('');
   const [page, setPage] = useState(1);
-  
+  // const { fileWorkPoints, isPendingGetFileWorkPoints, reFetchGetFileWorkPoints } = useGetWorkPoints(userModel.storeId)
+
   const [pageSize, setPageSize] = useState(10);
   const { staffs, metadata, isPendingGetUsers, reFetchGetStaffs } = useGetUserPage(userModel.storeId);
   useEffect(() => {
@@ -45,7 +46,7 @@ const StaffManament = () => {
         typeFeature: 'create',
       },
     });
-  }
+  };
   const handleNavigateDetail = (id: number) => {
     navigate(PATH_STAFF.STAFF_DETAIL_PATH.replace(':id', String(id)), {
       state: {
@@ -55,17 +56,44 @@ const StaffManament = () => {
       },
     });
   };
+  const handleExport = () => {
+    const form = document.createElement('form');
+    form.method = 'GET';
+    form.action = `http://localhost:8080/user/export-work-points`;
+
+    // Add the storeId as a hidden input
+    const inputStoreId = document.createElement('input');
+    inputStoreId.type = 'hidden';
+    inputStoreId.name = 'storeId';
+    inputStoreId.value = userModel.storeId?.toString();
+    form.appendChild(inputStoreId);
+
+    // Add the time as a hidden input
+    const inputTime = document.createElement('input');
+    inputTime.type = 'hidden';
+    inputTime.name = 'time';
+    inputTime.value = "MONTH";
+    form.appendChild(inputTime);
+
+    document.body.appendChild(form);
+    form.submit();
+    document.body.removeChild(form);
+  };
   return (
     <div className="list">
       <BaseLayout
         topbarChildren={
           <CustomeTopbar
             pageTitle="Danh sách Nhân viên"
-            buttonGroup={[{ buttonTitle: 'Tạo nhân viên', onClick: handleAddStaff }]}
+            buttonGroup={[
+              { buttonTitle: 'Xuất file chấm công', onClick: handleExport},
+              { buttonTitle: 'Tạo nhân viên', onClick: handleAddStaff },
+            ]}
           />
         }
       >
         <Box className="content staff-list">
+          
           <Box className="content-wrapper">
             <Grid container wrap="wrap" gap={4} className="content-wrapper-search">
               <Grid item container gap={4} xs={12} lg={7}>
