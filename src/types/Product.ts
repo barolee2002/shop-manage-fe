@@ -18,6 +18,7 @@ export type ProductAttributeType = {
   sellPrice: number;
   productId: number;
   imageLink: string;
+  imageLoad: File;
   quantity: number;
   otherAttribute: {
     name: string;

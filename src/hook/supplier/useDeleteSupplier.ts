@@ -1,7 +1,6 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import axiosClient from 'src/api/axiosClient';
 import { ENDPOINTS_SUPPLIER } from 'src/general/constants/endpoints';
-import { SupplierType } from 'src/types/supplier.type';
 
 const useDeleteSupplier = (): { deleteSupplier: (id: number) => Promise<number>; isDeleteSupplier: boolean } => {
   const [isDeleteSupplier, setIsPendingDeleteSupplier] = useState<boolean>(false);

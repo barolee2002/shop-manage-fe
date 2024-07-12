@@ -18,6 +18,8 @@ import CustomeSelectField from 'src/general/components/Field/CustomeSelectField'
 import './StaffDetail.styles.scss';
 import CustomTable from 'src/general/components/Table/CustomeTable';
 import { HistoryColumn } from 'src/general/components/Table/TableColumn/TableColumns';
+import useDeleteStaff from 'src/hook/user/useDeleteStaff';
+import { openAlert } from 'src/general/components/BaseLayout/alertSlice';
 const StaffDetail = () => {
   const { id } = useParams();
   const location = useLocation();
@@ -25,9 +27,10 @@ const StaffDetail = () => {
   const navigate = useNavigate();
   const inventories = useSelector(inventorySelector);
   const userModel = useSelector(userModelSelector);
-  const { pageTitle='', typeTitle, onTitleClick } = location.state ?? {};
+  const { pageTitle = '', typeTitle, onTitleClick } = location.state ?? {};
   const { user, isPendingGetUser } = useGetUserDetail(parseInt(id as string));
   const [createActionHistory] = useCreateActionHistory();
+  const { deleteStaff, isPendingDeleteStaff } = useDeleteStaff();
   const handleBackPage = useCallback(() => {
     navigate(`${onTitleClick}`);
   }, [onTitleClick]);
@@ -45,6 +48,16 @@ const StaffDetail = () => {
       },
     });
   };
+  const handleDeleteStaff = () => {
+    deleteStaff(Number(id))
+      .then(() => {
+        dispatch(openAlert({ message: 'Xóa nhân viên thành công', type: 'success' }));
+        navigate(PATH_STAFF.STAFF_LIST_PATH);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  };
   return (
     <BaseLayout
       topbarChildren={
@@ -53,7 +66,7 @@ const StaffDetail = () => {
           typeTitle={typeTitle ? typeTitle : 'text'}
           onTitleClick={handleBackPage}
           buttonGroup={[
-            { buttonTitle: 'Xóa', onClick: handleBackPage, color: 'error' },
+            { buttonTitle: 'Xóa', onClick: handleDeleteStaff, color: 'error', disable: isPendingDeleteStaff },
             {
               buttonTitle: 'Chỉnh sửa thông tin',
               onClick: handleEditInfo,

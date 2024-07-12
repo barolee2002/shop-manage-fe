@@ -36,7 +36,7 @@ const ReceiptInventoryInList = () => {
   const searchValue = useDebounce(searchString);
   const [filterForm, setFilterForm] = useState<FilterReceipt>({
     storeId: userModel.storeId,
-    inventoryId: userModel.storeId,
+    inventoryId: inventories[0].id,
     searchString: searchValue,
   } as FilterReceipt);
   const [metadata, setMetadata] = useState<metaData>({} as metaData);
@@ -149,28 +149,6 @@ const ReceiptInventoryInList = () => {
                       value={filterForm.supplierId}
                       options={suppliers.map((supplier) => ({ value: supplier.id, name: supplier.name }))}
                       onChange={(value: number) => handleChangeFilterForm('confirmUserId', value)}
-                    />
-                    <NumberRangeField
-                      title="Giá trị đơn"
-                      from={filterForm.fromTotal}
-                      to={filterForm.toTotal}
-                      onSetRange={(from: number, to: number) => handleSetRange('fromTotal', 'toTotal', from, to)}
-                    />
-                    <DateTimefield
-                      fromTime={getDayjsFormatDate(filterForm.bookingFromTime)}
-                      toTime={getDayjsFormatDate(filterForm.bookingToTime)}
-                      title="Ngày đặt hàng"
-                      onSetDate={(fromDate: Dayjs | null, toDate: Dayjs | null) =>
-                        handleSetRange('bookingFromTime', 'bookingToTime', fromDate, toDate)
-                      }
-                    />
-                    <DateTimefield
-                      fromTime={getDayjsFormatDate(filterForm.bookingFromTime)}
-                      toTime={getDayjsFormatDate(filterForm.bookingToTime)}
-                      title="Ngày nhập kho"
-                      onSetDate={(fromDate: Dayjs | null, toDate: Dayjs | null) =>
-                        handleSetRange('receiptFromTime', 'receiptToTime', fromDate, toDate)
-                      }
                     />
                   </React.Fragment>
                 </Filter>

@@ -449,7 +449,7 @@ export const SellingTicketColumn = [
     headerName: 'Khách hàng',
     headerClassName: 'content-wrapper-table-header',
     flex: 1,
-    renderCell: (params: SellingOrderType) => <p>{params?.customer?.name}</p>,
+    renderCell: (params: SellingOrderType) => <p>{params?.customer?.id ? params?.customer?.name: 'Khách lẻ'}</p>,
   },
   {
     field: 'staff',

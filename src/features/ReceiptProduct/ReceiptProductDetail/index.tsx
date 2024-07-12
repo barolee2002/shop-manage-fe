@@ -28,7 +28,7 @@ const ReceiptProductDetail = () => {
   const [createActionHistory] = useCreateActionHistory();
   const [payReceipt, isPendingPayReceipt] = usePayReceipt(id ? Number(id) : 0);
   const [inventoryInReceipt, isPendingInventoryInReceipt] = useInventoryInReceipt(id ? Number(id) : 0);
-  const [deleteReceipt, isPendingDeleteReceipt] = useDeleteReceipt(id ? Number(id) : 0);
+  const [deleteReceipt, isPendingDeleteReceipt] = useDeleteReceipt();
   const [receiptDetail, isPendingGetReceiptDetail, getReceiptDetail] = useGetReceiptProduct(id ?? '0');
   const handleBackPage = useCallback(
     (link: string) => {
@@ -92,7 +92,7 @@ const ReceiptProductDetail = () => {
     });
   };
   const handleDeleteReceipt = () => {
-    deleteReceipt()
+    deleteReceipt(Number(id))
       .then((res) => {
         // dispatch(openAlert({ message: 'Xóa đơn hàng thành công', type: 'success ' }));
         navigate(PATH_RECEIPT_PRODUCT.RECEIPT_PRODUCT_LIST_PATH);

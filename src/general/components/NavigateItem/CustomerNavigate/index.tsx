@@ -18,10 +18,10 @@ const CustomerNavigate = (props: { item: CustomerType }) => {
     <React.Fragment>
       <p
         role="presentation"
-        className="content-wrapper-table-header-title pointer-text important-text"
+        className="content-wrapper-table-header-title pointer-text important-text text-start"
         onClick={() => handleNavigteDetail(item)}
       >
-        {item.name}
+        {item?.name}
       </p>
     </React.Fragment>
   );

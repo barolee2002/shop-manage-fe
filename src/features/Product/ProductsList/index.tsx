@@ -202,7 +202,8 @@ export default function Product() {
         <Box className="content">
           <Box className="content-wrapper">
             <Box className="content-wrapper-search">
-              <div className="search-result">
+
+              <div className="search-result col-8">
                 <TextField
                   fullWidth
                   size="small"

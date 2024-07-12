@@ -1,0 +1,32 @@
+.content {
+    .header-receipt {
+      &-title {
+        font-size: 18px;
+        font-weight: 500;
+      }
+    }
+    .base-info-detail {
+      margin-top: 24px;
+      &-item {
+        background-color: #fff;
+        padding: 24px;
+        border-radius: 6px;
+      }
+    }
+    
+    .receipt-products-info{
+      background-color: #fff;
+      padding: 12px;
+      margin-top: 24px;
+      border-radius: 6px;
+      &-item{
+        width: 100%;
+        padding: 0 12px;
+        margin: 0 -12px;
+        .MuiFormLabel-root{
+          margin-left: 12px;
+        }
+      }
+    }
+  }
+  

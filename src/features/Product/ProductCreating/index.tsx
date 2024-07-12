@@ -12,7 +12,7 @@ import {
   IconButton,
   InputAdornment,
 } from '@mui/material';
-import React from 'react';
+import React, { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useLocation, useNavigate } from 'react-router';
 import { BaseLayout } from 'src/general/components/BaseLayout';
@@ -44,9 +44,10 @@ const ProductCreating = () => {
   const [categories] = useGetCategory(userModel.storeId);
   const inventories = useSelector(inventorySelector);
   const [brands] = useBrand(userModel.storeId);
-  const [updateProduct, isPendingUpdateProduct] = useUpdateProduct();
+  const [updateProduct, isPendingUpdateProduct] = useUpdateProduct(productEdit?.id);
   const [createProduct, isPendingCreateProduct] = useCreateProduct();
   const [uploadImage, isPendingUploadImage] = useUploadImage();
+  const [imageChange, setImageChange] = useState(false);
   const [attribute, setAttribute] = React.useState<ProductAttributeType>(
     initialProductAttribute as ProductAttributeType
   );
@@ -73,25 +74,11 @@ const ProductCreating = () => {
     );
   };
 
-  const handleAddInventory = () => {
-    setAttribute(
-      (prev: ProductAttributeType) =>
-        ({ ...prev, inventoryList: [...prev.inventoryList, initialInventoryCost] }) as ProductAttributeType
-    );
-  };
   const handleSetOtherAttribute = (attributeIndex: number, title: string, value: string | null) => {
     setAttribute((prev: ProductAttributeType) => ({
       ...prev,
       otherAttribute: prev.otherAttribute.map((attribute, index) => {
         return index === attributeIndex ? { ...attribute, [title]: value } : attribute;
-      }),
-    }));
-  };
-  const handleSetInventory = (inventoryIndex: number, title: string, value: any) => {
-    setAttribute((prev: ProductAttributeType) => ({
-      ...prev,
-      inventoryList: prev.inventoryList.map((inventory, index) => {
-        return index === inventoryIndex ? { ...inventory, [title]: value } : inventory;
       }),
     }));
   };
@@ -104,12 +91,6 @@ const ProductCreating = () => {
     setAttribute((prev: ProductAttributeType) => ({
       ...prev,
       otherAttribute: prev.otherAttribute.filter((_, index) => index !== indexNumber),
-    }));
-  };
-  const handleDeleteInventory = (indexNumber: number) => {
-    setAttribute((prev: ProductAttributeType) => ({
-      ...prev,
-      inventoryList: prev.inventoryList.filter((_, index) => index !== indexNumber),
     }));
   };
   const handleChangeAttribute = (title: string, value: any) => {
@@ -130,10 +111,14 @@ const ProductCreating = () => {
     );
     setTabValue(value);
   };
+  console.log(productEdit);
+
   const fixDataPost = React.useMemo(
     () => async (productEdit: ProductType, attribute: ProductAttributeType) => {
       const link = productEdit.imageLink
-        ? await uploadImage(await getImageFile(productEdit.imageLink, `${userModel.storeId}/${productEdit.name}`))
+        ? imageChange
+          ? await uploadImage(await getImageFile(productEdit.imageLink, `${userModel.storeId}/${productEdit.name}`))
+          : productEdit.imageLink
         : '';
       const attributes = await Promise.all(
         productEdit.attributes.map(async (attribute) => ({
@@ -185,7 +170,6 @@ const ProductCreating = () => {
   const handleChangeAttributeImage = React.useCallback((image: File) => {
     handleChangeAttribute('imageLink', getImageUrl(image));
   }, []);
-  console.log(isPendingCreateProduct && isPendingUploadImage);
 
   return (
     <BaseLayout
@@ -299,7 +283,10 @@ const ProductCreating = () => {
                 imageKey={tabValue}
                 once
                 parentImage={productEdit.imageLink ? productEdit.imageLink : ''}
-                parentCallback={(image: File) => dispatch(changeValueEditProduct({ imageLink: getImageUrl(image) }))}
+                parentCallback={(image: File) => {
+                  setImageChange(true);
+                  dispatch(changeValueEditProduct({ imageLink: getImageUrl(image) }));
+                }}
               />
             </Box>
           </Box>
@@ -342,7 +329,7 @@ const ProductCreating = () => {
               />
             </Box>
           </Box>
-          
+
           <Box className="extension-setup">
             <Box className="extension-setup-item">
               {attribute.otherAttribute &&

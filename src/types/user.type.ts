@@ -27,6 +27,7 @@ export type UserLogin = {
   id: number;
   token: string;
   expireTime: string;
+  isAuthentication: number;
 };
 
 export type UserPageType = {

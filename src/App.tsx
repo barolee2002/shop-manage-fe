@@ -8,7 +8,7 @@ import Dashboard from './features/Dashboard';
 import ProductDetail from './features/Product/ProductDetail';
 import ProductCreating from './features/Product/ProductCreating';
 import RereiptProductList from './features/ReceiptProduct/RereiptProductList';
-import Regsiter from './features/Auth/screens/Regsiter'
+import Regsiter from './features/Auth/screens/Regsiter';
 import {
   PATH_AUTH,
   PATH_CUSTOMER,
@@ -40,6 +40,9 @@ import CustomersList from './features/Customer/CustomersList';
 import CustomerDetail from './features/Customer/CustomerDetail';
 import SupplierDetail from './features/Supplier/SupplierDetail';
 import RegisterConfirm from './features/Auth/RegisterConfirm';
+import SellingDetail from './features/Selliing/SellingDetail';
+import RegisterFinish from './features/Auth/RegisterFinish';
+import PublicRoute from './route/PublicRoute';
 const theme = createTheme({
   typography: {
     fontFamily: ['Inter', '-apple-system', '"Segoe UI"', 'Roboto', 'Arial', 'sans-serif'].join(','),
@@ -47,15 +50,21 @@ const theme = createTheme({
 });
 
 const App: React.FC = () => {
-  // const { logout } = useAuth();
-  // const isLogged = sessionStorage.getItem('logged');
-  // useEffect(() => {
-  //   return () => {
-  //     if (!isLogged) {
-  //       logout();
-  //     }
-  //   };
-  // });
+  const { logout } = useAuth();
+  const path = window.location.pathname;
+  
+  const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+    if(path !== '/selling') {
+      e.preventDefault();
+      logout();
+    }
+  };
+  window.addEventListener('beforeunload', handleBeforeUnload)
+  useEffect(() => {
+    return () => {
+      window.removeEventListener('beforeunload', handleBeforeUnload);
+    };
+  });
   return (
     <div className="App">
       <ThemeProvider theme={theme}>
@@ -191,6 +200,14 @@ const App: React.FC = () => {
               }
             />
             <Route
+              path={PATH_SELLING.SELLING_DETAIL}
+              element={
+                <PrivateRoute>
+                  <SellingDetail />
+                </PrivateRoute>
+              }
+            />
+            <Route
               path={PATH_STOCK_MANAGEMENT.STOCK_MANAGEMENT}
               element={
                 <PrivateRoute>
@@ -233,6 +250,14 @@ const App: React.FC = () => {
             <Route path={PATH_AUTH.LOGIN_PATH} element={<SignInScreen />} />
             <Route path={PATH_AUTH.REGISTER} element={<Regsiter />} />
             <Route path={PATH_AUTH.REGISTER_CHECK} element={<RegisterConfirm />} />
+            <Route
+              path={'/register/finish'}
+              element={
+                <PublicRoute>
+                  <RegisterFinish />
+                </PublicRoute>
+              }
+            />
           </Routes>
         </Router>
       </ThemeProvider>

@@ -3,7 +3,9 @@ import axiosClient from 'src/api/axiosClient';
 import { ENDPOINTS_SUPPLIER } from 'src/general/constants/endpoints';
 import { SupplierType } from 'src/types/supplier.type';
 
-const useUpdateSupplier = (storeId: number): {
+const useUpdateSupplier = (
+  storeId: number
+): {
   updateSupplier: (data: SupplierType) => Promise<SupplierType>;
   isPendingUpdateSupplier: boolean;
 } => {
@@ -13,7 +15,7 @@ const useUpdateSupplier = (storeId: number): {
     try {
       const response = await axiosClient.put<SupplierType>(ENDPOINTS_SUPPLIER.UPDATE_SUPPLIER, {
         ...data,
-        storeId
+        storeId,
       });
       setIsPendingUpdateSupplier(false);
       return response.data;

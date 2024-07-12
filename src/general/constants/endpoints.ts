@@ -1,5 +1,6 @@
 export const ENDPOINTS_PRODUCT = {
   GET_PRODUCTS_LIST_ENDPOINT: 'product/all',
+  DELETE: 'product/delete/:id'
 };
 
 export const RECEIPT_ENDPOINTS = {
@@ -37,6 +38,7 @@ export const ENDPOINT_USER = {
   UPDATE_USER: 'user/updating/:id',
   GET_USER_PAGE: 'user/get-page/:storeId',
   GET_WORK_POINTS: 'user/export-work-points',
+  DELETE: 'user/delete/:id',
 };
 
 export const HISTORY_ENDPOINT = {
@@ -53,10 +55,12 @@ export const SELLING_ENDPOINTS = {
   CREATE_SELLING: 'selling-order/creating',
   GET_SELLING_TIKETS: 'selling-order/list-all/:storeId',
   GET_SELLING_CUSTOMER: 'selling-order/customer/:customerId',
+  GET_SELLING_DETAIL: 'selling-order/get-detail/:id',
 };
 
 export const CUSTOMER_ENDPOINTS = {
   GET_CUSTOMERS: 'customer/list-all/:storeId',
+  GET_CUSTOMERS_lIST: 'customer/list/:storeId',
   GET_CUSTOMER_DETAIL: 'customer/get-detail/:id',
   CREATE_CUSTOMER: 'customer/creating',
   GET_TOP_CUSTOMER_ECPENDITURE: 'customer/list-top-expenditure/:storeId',
@@ -69,8 +73,8 @@ export const STOCK_MANAGEMENT_ENDPOINTS = {
   DELETE_STOCK: '/inventory/delete/:id',
   GET_INVENTORIES: '/inventory/get-all/:storeId',
   GET_STAFFS: '/inventory/:id/staffs',
-}
+};
 export const STATISTIC_ENDPONTS = {
-  STATISTIC : 'selling-order/statistic/:storeId',
-  STATISTIFC_DETAIL : 'selling-order/statistic-detail/:storeId'
-}
+  STATISTIC: 'selling-order/statistic/:storeId',
+  STATISTIFC_DETAIL: 'selling-order/statistic-detail/:storeId',
+};

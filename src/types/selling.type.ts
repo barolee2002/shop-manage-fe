@@ -12,7 +12,7 @@ export type OrderDetailType = {
   quantity: number;
 };
 export type OrderFilter = {
-  staffId?:number;
+  staffId?: number;
   inventoryId?: number;
   paymentType?: string;
   sellFromTime?: string;
@@ -21,8 +21,8 @@ export type OrderFilter = {
   fromTotal?: number;
   toTotal?: number;
   page?: number;
-  pageSize?:number
-}
+  pageSize?: number;
+};
 export type SellingOrderType = {
   id: number;
   key: number;
@@ -38,6 +38,6 @@ export type SellingOrderType = {
   details: OrderDetailType[];
 };
 export type SellingList = {
-  data: SellingOrderType[],
-  metaData: metaData
-}
+  data: SellingOrderType[];
+  metaData: metaData;
+};

@@ -52,16 +52,22 @@ import Bill from 'src/general/components/Bill';
 import useGetCustomers from 'src/hook/customer/useGetCustomers';
 import { CustomerType } from 'src/types/customer.type';
 import useCreateSelling from 'src/hook/selling/useCreateSelling';
-import { UserType } from 'src/types/user.type';
+import { UserLogin, UserType } from 'src/types/user.type';
 import { getTotalPriceSelling } from 'src/utils/getTotalPriceSelling';
 import { Link } from 'react-router-dom';
+import { getCookie } from 'src/utils/Cookie';
+import useGetCustomersList from 'src/hook/customer/useGetCustomerList';
+import { updateAxiosAccessToken } from 'src/api/axiosClient';
 
 const SellingCreating = () => {
   const dispatch = useDispatch();
   const [searchString, setSearchString] = useState<string>('');
+  const user = getCookie('userInfo');
+  const userModel: UserLogin = JSON.parse(user);
+  updateAxiosAccessToken(userModel.token)
   const navigate = useNavigate();
   const inventories = useSelector(inventorySelector);
-
+  // const userModel = useSelector(userModelSelector);
   const alert = useSelector(alertSelector);
   const handleCloseAlert = (event: React.SyntheticEvent | Event, reason?: string) => {
     if (reason === 'clickaway') {
@@ -71,7 +77,7 @@ const SellingCreating = () => {
   };
   const products = useSelector(productSelector);
   const [tabValue, setTabValue] = React.useState(0);
-  const userModel = useSelector(userModelSelector);
+  
   const [getProducts] = useGetProductList();
   const { logout } = useAuth();
   const [showDiscount, setShowDiscount] = useState<number>(0);
@@ -80,7 +86,7 @@ const SellingCreating = () => {
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const [sellings, setSellings] = useState<SellingOrderType[]>([initialOrder]);
   const open = Boolean(anchorEl);
-  const { reFetchGetCustomers } = useGetCustomers(userModel.storeId);
+  const { reFetchGetCustomers } = useGetCustomersList(userModel.storeId);
   const { createSelling } = useCreateSelling();
   const [customerSearch, setCustomerSearch] = useState<string>('');
   const customerSearchValue = useDebounce(customerSearch);
@@ -93,7 +99,8 @@ const SellingCreating = () => {
     pageSize: rowsPerPage,
     page: page + 1,
   } as FilterProductType);
-
+  
+  
   const handleChangePage = (event: React.MouseEvent<HTMLButtonElement> | null, newPage: number) => {
     setPage(newPage);
   };
@@ -228,7 +235,7 @@ const SellingCreating = () => {
   }, [sellings[tabValue]]);
   const handleChooseProduct = (chooseProduct: ProductAttributeType) => {
     const lenght = sellings[tabValue]?.details?.filter((detail) => detail?.product?.id === chooseProduct?.id);
-    if (lenght.length) {
+    if (lenght?.length) {
       dispatch(openAlert({ message: 'Sản phẩm đã sẵn sàng trong đơn hàng', type: 'error' }));
       return;
     }
@@ -318,10 +325,8 @@ const SellingCreating = () => {
     handleSetFilter('pageSize', rowsPerPage);
   }, [searchValue, page, rowsPerPage]);
   useEffect(() => {
-    reFetchGetCustomers({ searchString: customerSearchValue }).then((res) => setCustomerOptions(res.data));
-  }, [customerSearchValue]);
-  console.log(sellings);
-
+    reFetchGetCustomers().then((res) => setCustomerOptions(res));
+  }, []);
   const fetchProduct = () => {
     getProducts(filter)
       .then((res) => {
@@ -577,7 +582,7 @@ const SellingCreating = () => {
               </Select>
             </FormControl>
             <FormControl fullWidth>
-              <Autocomplete
+              {customerOptions&&<Autocomplete
                 className="mt12"
                 value={sellings[tabValue]?.customer} // Default value to empty string if customer or customer name is not present
                 options={customerOptions}
@@ -604,7 +609,7 @@ const SellingCreating = () => {
                     onChange={(e) => setCustomerSearch(e.target.value)}
                   />
                 )}
-              />
+              />}
             </FormControl>
             <Bill
               ref={billref}

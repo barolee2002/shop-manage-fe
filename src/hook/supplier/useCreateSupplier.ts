@@ -3,7 +3,9 @@ import axiosClient from 'src/api/axiosClient';
 import { ENDPOINTS_SUPPLIER } from 'src/general/constants/endpoints';
 import { SupplierType } from 'src/types/supplier.type';
 
-const useCreateSupplier = (storeId: number): {
+const useCreateSupplier = (
+  storeId: number
+): {
   createSupplier: (data: SupplierType) => Promise<SupplierType>;
   isPendingCreateSupplier: boolean;
 } => {
@@ -13,7 +15,7 @@ const useCreateSupplier = (storeId: number): {
     try {
       const response = await axiosClient.post<SupplierType>(ENDPOINTS_SUPPLIER.CREATE_SUPPLIER, {
         ...data,
-        storeId
+        storeId,
       });
       setIsPendingCreateSupplier(false);
       return response.data;

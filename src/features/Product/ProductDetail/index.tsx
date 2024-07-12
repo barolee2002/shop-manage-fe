@@ -26,6 +26,8 @@ import ColabRow from 'src/general/components/Table/Product/ColabRow';
 import SubTable from 'src/general/components/Table/ColabTable/SubTable';
 import { PATH_PRODUCT } from 'src/general/constants/path';
 import { updateProductEdit } from '../ProductCreating/productEditSlice';
+import useDeleteProduct from 'src/hook/product/useDeleteProduct';
+import { openAlert } from 'src/general/components/BaseLayout/alertSlice';
 
 export default function ProductDetail() {
   const { id } = useParams();
@@ -38,6 +40,7 @@ export default function ProductDetail() {
   const productDetail = useSelector(productDetailSelector);
   const [backupDetail, setBackupDetail] = React.useState<ProductType>({} as ProductType);
   const [newAttribute, setNewAttribute] = React.useState<ProductAttributeType>({} as ProductAttributeType);
+  const { deleteProduct, isPendingDeleteProduct } = useDeleteProduct();
   const [categories, setCategories] = React.useState([]);
   const [attributeImage, setAttributeImage] = React.useState<File | null>(null);
   const [show, setShow] = React.useState('');
@@ -112,6 +115,16 @@ export default function ProductDetail() {
       },
     });
   };
+  const handleDeleteProduct = () => {
+    deleteProduct(Number(id))
+      .then(() => {
+        dispatch(openAlert({ message: 'Xóa hàng hóa thành công', type: 'success' }));
+        navigate(PATH_PRODUCT.PRODUCT_LIST_PATH);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  };
   return (
     <div>
       <BaseLayout
@@ -121,7 +134,7 @@ export default function ProductDetail() {
             typeTitle={typeTitle ? typeTitle : 'text'}
             onTitleClick={() => handleBackPage(onTitleClick)}
             buttonGroup={[
-              { buttonTitle: 'Xóa', onClick: () => {}, color: 'error' },
+              { buttonTitle: 'Xóa', onClick: handleDeleteProduct, color: 'error', disable: isPendingDeleteProduct },
               {
                 buttonTitle: 'Sửa sản phẩm',
                 onClick: handleNavigateUpdateProduct,

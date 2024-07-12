@@ -48,27 +48,43 @@ const StaffEdit = () => {
       [title]: value,
     }));
   };
-  const handleCreateStaff = () => {
-    createStaff({ ...staff, storeId: userModel.storeId })
-      .then((res) => {
-        dispatch(openAlert({ message: 'Tạo nhân viên thành công', type: 'success' }));
-        navigate(PATH_STAFF.STAFF_DETAIL_PATH.replace(':id', String(res.id)));
-      })
-      .catch((err ) => {
-        dispatch(openAlert({ message: `Tạo nhân viên thất bại,\n vui lòng thử lại sau`, type: 'error' }));
-      });
+  const handleUpoadImage = async () => {
+    const response = image !== null ? await uploadImage(image) : staff.avatar ? staff.avatar : '';
+    return response;
   };
-  const handleUpdateStaffInfo = () => {
-    updateUserInfo(staff.id,staff)
-      .then((res) => {
-        dispatch(openAlert({ message: 'Cập nhập thông tin nhân viên thành công', type: 'success' }));
-        navigate(PATH_STAFF.STAFF_DETAIL_PATH.replace(':id', String(res.id)));
-      })
-      .catch((err) => {
-        dispatch(
-          openAlert({ message: `Cập nhập thông tin nhân viên thất bại,\n vui lòng thử lại sau`, type: 'error' })
-        );
-      });
+  const handleCreateStaff = async () => {
+    const link = await handleUpoadImage();
+    if (image !== null && link === null) {
+      throw new Error('loi tai anh');
+    }
+    link &&
+      createStaff({ ...staff, storeId: userModel.storeId, avatar: link })
+        .then((res) => {
+          dispatch(openAlert({ message: 'Tạo nhân viên thành công', type: 'success' }));
+          navigate(PATH_STAFF.STAFF_DETAIL_PATH.replace(':id', String(res.id)));
+        })
+        .catch((err) => {
+          dispatch(openAlert({ message: `Tạo nhân viên thất bại,\n vui lòng thử lại sau`, type: 'error' }));
+        });
+  };
+  console.log(image);
+
+  const handleUpdateStaffInfo = async () => {
+    const link = await handleUpoadImage();
+    if (image !== null && link === null) {
+      throw new Error('loi tai anh');
+    }
+    link &&
+      updateUserInfo(staff.id, { ...staff, avatar: link })
+        .then((res) => {
+          dispatch(openAlert({ message: 'Cập nhập thông tin nhân viên thành công', type: 'success' }));
+          navigate(PATH_STAFF.STAFF_DETAIL_PATH.replace(':id', String(res.id)));
+        })
+        .catch((err) => {
+          dispatch(
+            openAlert({ message: `Cập nhập thông tin nhân viên thất bại,\n vui lòng thử lại sau`, type: 'error' })
+          );
+        });
   };
   const handleChangeStaffInfo = (title: string, value: any) => {
     dispatch(changeValueEditStaff({ [title]: value }));
@@ -80,8 +96,28 @@ const StaffEdit = () => {
     return districtsOptions?.find((place) => place?.Name === address.districts)?.Wards;
   }, [address]);
   useEffect(() => {
+    const addressOld = staff?.address?.split(', ');
+    if (addressOld && addressOld.length === 4) {
+      setAddress({
+        city: addressOld[3],
+        districts: addressOld[2],
+        wards: addressOld[1],
+        other: addressOld[0],
+      });
+    }
+    if (addressOld && addressOld.length === 3) {
+      setAddress({
+        city: addressOld[2],
+        districts: addressOld[1],
+        wards: addressOld[0],
+        other: '',
+      });
+    }
+
     createActionHistory({ message: 'Màn hình tạo nhân viên' });
   }, []);
+  console.log(address);
+
   useEffect(() => {
     const userAddress = `${
       address?.other ? address?.other + ', ' : ''
@@ -153,7 +189,7 @@ const StaffEdit = () => {
             type="number"
             label="Số điện thoại"
             className="base-info-code"
-            value={(staff?.phone)}
+            value={staff?.phone}
             onChange={(e) => handleChangeStaffInfo('phone', e.target.value)}
           />
           <Grid container>

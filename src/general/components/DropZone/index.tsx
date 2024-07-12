@@ -23,14 +23,17 @@ function BaseDropzone(props: Props) {
   const [images, setImages] = useState<any>([]);
   const [image, setImage] = useState<File | null | string>(null);
   const [isDrapping, setIsDrapping] = useState(false);
-  // console.log(image);
+  const [resfesh, setRefesh] = useState(0);
   const didMountRef = useRef(false);
   const fileInputRef = useRef<any>(null);
-
+  useEffect(() => {
+    console.log(resfesh);
+  }, [resfesh]);
   useEffect(() => {
     setImages([]);
     setImage(parentImage || null);
-    didMountRef.current= false;
+    didMountRef.current = false;
+    setRefesh(resfesh + 1);
   }, [imageKey]);
   useEffect(() => {
     if (didMountRef.current) {
@@ -39,9 +42,10 @@ function BaseDropzone(props: Props) {
         : parentCallback && parentCallback(images);
     }
   }, [images, image]);
+
   const selectFiles = () => {
     fileInputRef.current !== null && fileInputRef.current.click();
-    didMountRef.current= true;
+    didMountRef.current = true;
   };
   const onFileSelect = (e: any) => {
     const files = e.target.files;

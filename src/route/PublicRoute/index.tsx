@@ -11,11 +11,11 @@ interface PrivateRouteProps {
   children: JSX.Element;
 }
 
-const PrivateRoute = ({ children }: PrivateRouteProps) => {
+const PublicRoute = ({ children }: PrivateRouteProps) => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const user = getCookie('userInfo');
-  const { getInventories } = useGetInventory();
+  const {getInventories} = useGetInventory()
   const isAuthenticated = user ? true : false;
   useEffect(() => {
     const userModel: UserLogin = JSON.parse(user);
@@ -30,4 +30,4 @@ const PrivateRoute = ({ children }: PrivateRouteProps) => {
   return isAuthenticated ? children : <Navigate to="/login" />;
 };
 
-export default PrivateRoute;
+export default PublicRoute;

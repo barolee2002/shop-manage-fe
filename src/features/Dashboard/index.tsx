@@ -226,11 +226,6 @@ const Dashboard = () => {
                 ))}
               </Grid>
             </Grid>
-            <Grid className="dasdboard-wrapper">
-              <Grid className="dasdboard-wrapper-item">
-                <p>Top sản phẩm ưa chuộng nhất</p>
-              </Grid>
-            </Grid>
           </Box>
         </Box>
       </BaseLayout>
